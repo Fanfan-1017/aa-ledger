@@ -316,20 +316,62 @@
   }
   .tab-btn.sport.active{color:var(--hk-pink)}
 
-  /* Kitty 猫头区域 */
-  .kitty-box{text-align:center;padding:20px 0 10px}
-  .kitty-face{
-    display:inline-block;position:relative;width:80px;height:80px;
-    transition:filter 0.3s;
+  /* Kitty 图片区域 */
+  .kitty-box{text-align:center;padding:16px 0 12px}
+  .kitty-img-wrap{
+    display:inline-block;position:relative;width:120px;height:120px;
+    border-radius:50%;overflow:hidden;border:4px solid var(--hk-border);
+    background:var(--hk-bg);box-shadow:0 4px 14px rgba(255,105,180,0.2);
   }
-  .kitty-face.grey{filter:grayscale(100%);opacity:0.5}
-  .kitty-svg{width:100%;height:100%}
-  .kitty-ribbon{position:absolute;top:-6px;right:-10px;font-size:20px}
-  .kitty-progress{margin-top:8px;font-size:14px;color:var(--hk-text);font-weight:600}
-  .kitty-progress .done{color:var(--hk-pink);font-size:20px}
+  .kitty-img-wrap img{
+    width:100%;height:100%;object-fit:cover;transition:filter 0.3s,opacity 0.3s;
+  }
+  .kitty-img-wrap.grey img{filter:grayscale(100%);opacity:0.4}
+  .kitty-progress{margin-top:10px;font-size:15px;color:var(--hk-text);font-weight:600}
+  .kitty-progress .done{color:var(--hk-pink)}
   .kitty-progress .undone{color:var(--hk-grey)}
 
-  /* 打卡列表 */
+  /* 三宫格统计 */
+  .hk-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:12px 0}
+  .hk-stat-card{
+    background:var(--hk-card);border:1px solid var(--hk-border);border-radius:var(--radius);
+    padding:12px 8px;text-align:center;transition:all 0.12s;
+  }
+  .hk-stat-card:active{transform:scale(0.97)}
+  .hk-stat-card .stat-num{font-size:22px;font-weight:700;color:var(--hk-pink);line-height:1.2}
+  .hk-stat-card .stat-label{font-size:12px;color:var(--hk-text);margin-top:2px}
+
+  /* 每周打卡条 */
+  .hk-week{background:var(--hk-card);border:1px solid var(--hk-border);border-radius:var(--radius);padding:14px 10px;margin-bottom:14px}
+  .hk-week-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+  .hk-week-head .wk-title{font-size:14px;font-weight:600;color:var(--hk-text)}
+  .hk-week-head .wk-arrows{display:flex;gap:6px}
+  .hk-week-head .wk-arrow{
+    width:28px;height:28px;border-radius:50%;border:1px solid var(--hk-border);
+    background:var(--card);cursor:pointer;font-size:14px;color:var(--hk-pink);
+    display:flex;align-items:center;justify-content:center;transition:all 0.12s;
+    -webkit-tap-highlight-color:transparent;font-family:var(--font);
+  }
+  .hk-week-head .wk-arrow:active{background:var(--hk-bg)}
+  .hk-week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+  .hk-day{
+    display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 2px;
+    border-radius:var(--radius-sm);cursor:pointer;transition:all 0.12s;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .hk-day:active{background:var(--hk-bg)}
+  .hk-day .hk-date{font-size:12px;color:var(--hk-text);font-weight:600}
+  .hk-day .hk-dow{font-size:10px;color:var(--hk-text)}
+  .hk-day.today{border:2px solid #ffd700;border-radius:8px;padding:4px 2px}
+  .hk-day.other-month .hk-date,.hk-day.other-month .hk-dow{color:var(--text3)}
+  .hk-day-circle{
+    width:22px;height:22px;border-radius:50%;border:2px solid var(--hk-pink);
+    display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff;
+    transition:all 0.15s;margin-top:2px;
+  }
+  .hk-day-circle.checked{background:var(--hk-pink);border-color:var(--hk-pink)}
+
+  /* 任务列表 */
   .checkin-list{margin:10px 0}
   .checkin-item{
     display:flex;align-items:center;gap:10px;padding:12px 14px;
@@ -345,8 +387,10 @@
   }
   .checkin-cb.checked{background:var(--hk-pink);border-color:var(--hk-pink)}
   .checkin-emoji{font-size:18px;flex-shrink:0}
-  .checkin-title{flex:1;font-size:14px;color:var(--text);font-weight:500}
+  .checkin-info{flex:1;min-width:0}
+  .checkin-title{font-size:14px;color:var(--text);font-weight:500}
   .checkin-item.done .checkin-title{color:var(--hk-text)}
+  .checkin-freq{font-size:11px;color:var(--hk-text);margin-top:1px;opacity:0.8}
   .checkin-actions{display:flex;gap:2px;flex-shrink:0}
   .checkin-actions button{
     width:28px;height:28px;border-radius:50%;border:none;background:transparent;
@@ -364,19 +408,30 @@
   }
   .add-checkin-btn:active{background:var(--hk-bg)}
 
-  /* 历史记录 */
-  .checkin-history{margin-top:16px;padding-top:12px;border-top:1px solid var(--hk-border)}
-  .checkin-history .hist-head{font-size:13px;font-weight:600;color:var(--hk-text);margin-bottom:8px}
-  .hist-item{
-    display:flex;align-items:center;gap:8px;padding:6px 0;font-size:13px;color:var(--text2)
+  /* 运动弹窗 */
+  .sport-modal .form-row{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+  .sport-modal .form-row label{font-size:13px;color:var(--hk-text);font-weight:500}
+  .sport-modal .form-row input{
+    padding:10px;border:1px solid var(--hk-border);border-radius:var(--radius-sm);
+    font-size:14px;color:var(--text);outline:none;font-family:var(--font)
   }
-  .hist-item .hist-date{font-weight:500;min-width:40px}
-  .hist-item .hist-bar{
-    flex:1;height:6px;background:var(--hk-bg);border-radius:3px;overflow:hidden
+  .sport-modal .form-row input:focus{border-color:var(--hk-pink)}
+  .sport-modal .emoji-row{display:flex;flex-wrap:wrap;gap:6px}
+  .sport-modal .emoji-pick{
+    width:36px;height:36px;border:1px solid var(--hk-border);border-radius:var(--radius-sm);
+    background:var(--hk-card);cursor:pointer;font-size:18px;display:flex;
+    align-items:center;justify-content:center;transition:all 0.12s;
+    -webkit-tap-highlight-color:transparent;
   }
-  .hist-item .hist-fill{height:100%;border-radius:3px;background:var(--hk-pink);transition:width 0.3s}
-  .hist-item .hist-num{font-size:12px;color:var(--hk-text);font-weight:600;min-width:40px;text-align:right}
-  .hist-item .hist-emoji{font-size:14px}
+  .sport-modal .emoji-pick.active{border-color:var(--hk-pink);background:var(--hk-bg);box-shadow:0 0 0 2px rgba(255,105,180,0.2)}
+  .sport-modal .freq-row{display:flex;gap:6px}
+  .sport-modal .freq-btn{
+    flex:1;padding:8px;border:1px solid var(--hk-border);border-radius:var(--radius-sm);
+    background:var(--hk-card);cursor:pointer;font-size:14px;color:var(--hk-text);
+    text-align:center;transition:all 0.12s;font-family:var(--font);
+    -webkit-tap-highlight-color:transparent;
+  }
+  .sport-modal .freq-btn.active{background:var(--hk-pink);border-color:var(--hk-pink);color:#fff;font-weight:600}
 </style>
 </head>
 <body>
@@ -445,44 +500,64 @@
   <!-- ==================== 运动打卡面板 ==================== -->
   <div class="tab-panel" id="panelSport">
     <div class="kitty-box">
-      <div class="kitty-face" id="kittyFace">
-        <svg class="kitty-svg" viewBox="0 0 100 100">
-          <!-- 脸 -->
-          <ellipse cx="50" cy="55" rx="38" ry="34" fill="#fff" stroke="#ffb6c1" stroke-width="2"/>
-          <!-- 耳朵 -->
-          <polygon points="20,25 10,2 35,22" fill="#fff" stroke="#ffb6c1" stroke-width="2"/>
-          <polygon points="80,25 90,2 65,22" fill="#fff" stroke="#ffb6c1" stroke-width="2"/>
-          <polygon points="21,22 15,8 32,22" fill="#ffb6c1"/>
-          <polygon points="79,22 85,8 68,22" fill="#ffb6c1"/>
-          <!-- 眼睛 -->
-          <ellipse cx="38" cy="50" rx="5" ry="5.5" fill="#333"/>
-          <ellipse cx="62" cy="50" rx="5" ry="5.5" fill="#333"/>
-          <circle cx="39.5" cy="48.5" r="1.8" fill="#fff"/>
-          <circle cx="63.5" cy="48.5" r="1.8" fill="#fff"/>
-          <!-- 鼻子 -->
-          <ellipse cx="50" cy="58" rx="3" ry="2.5" fill="#ff69b4"/>
-          <!-- 胡须 -->
-          <line x1="20" y1="55" x2="36" y2="57" stroke="#bbb" stroke-width="1"/>
-          <line x1="20" y1="60" x2="36" y2="59" stroke="#bbb" stroke-width="1"/>
-          <line x1="80" y1="55" x2="64" y2="57" stroke="#bbb" stroke-width="1"/>
-          <line x1="80" y1="60" x2="64" y2="59" stroke="#bbb" stroke-width="1"/>
-          <!-- 嘴巴 -->
-          <line x1="47" y1="61" x2="50" y2="63" stroke="#ff69b4" stroke-width="1.5" stroke-linecap="round"/>
-          <line x1="53" y1="61" x2="50" y2="63" stroke="#ff69b4" stroke-width="1.5" stroke-linecap="round"/>
-        </svg>
-        <span class="kitty-ribbon">🎀</span>
+      <div class="kitty-img-wrap" id="kittyImgWrap">
+        <img id="kittyImg" src="https://workbuddy-bga-1258344699.cos.ap-beijing.myqcloud.com/attachments/daaba5d3-eb53-4e67-8330-720f28e8879c/1785161839_3c35d207/Screenshot_20260727_231711.jpg" alt="Hello Kitty">
       </div>
       <div class="kitty-progress" id="kittyProgress">今日打卡 0/0</div>
+    </div>
+
+    <div class="hk-stats">
+      <div class="hk-stat-card">
+        <div class="stat-num" id="statTotal">0</div>
+        <div class="stat-label">查看任务</div>
+      </div>
+      <div class="hk-stat-card">
+        <div class="stat-num" id="statDone">0</div>
+        <div class="stat-label">已完成</div>
+      </div>
+      <div class="hk-stat-card">
+        <div class="stat-num" id="statHistory">0</div>
+        <div class="stat-label">历史任务</div>
+      </div>
+    </div>
+
+    <div class="hk-week">
+      <div class="hk-week-head">
+        <span class="wk-title" id="wkTitle">本周打卡</span>
+        <div class="wk-arrows">
+          <button class="wk-arrow" id="wkPrev">‹</button>
+          <button class="wk-arrow" id="wkNext">›</button>
+        </div>
+      </div>
+      <div class="hk-week-grid" id="hkWeekGrid"></div>
     </div>
 
     <div class="checkin-list" id="checkinList"></div>
     <div class="empty" id="checkinEmpty">还没有打卡项，点击下方添加</div>
 
     <button class="add-checkin-btn" id="btnAddCheckin">+ 添加打卡项</button>
+  </div>
 
-    <div class="checkin-history" id="checkinHistory">
-      <div class="hist-head">📋 最近记录</div>
-      <div id="histList"></div>
+  <!-- 运动打卡弹窗 -->
+  <div class="modal-mask" id="sportModalMask">
+    <div class="modal sport-modal">
+      <h3 id="sportModalTitle">添加打卡项</h3>
+      <div class="form-row">
+        <label>项目名称</label>
+        <input type="text" id="sportTitle" placeholder="如：跑步30分钟" maxlength="20">
+      </div>
+      <div class="form-row">
+        <label>选择 emoji</label>
+        <div class="emoji-row" id="sportEmojiRow"></div>
+      </div>
+      <div class="form-row">
+        <label>一周几次</label>
+        <div class="freq-row" id="sportFreqRow"></div>
+      </div>
+      <div class="actions">
+        <button id="sportModalCancel">取消</button>
+        <button class="primary" id="sportModalSave" style="background:var(--hk-pink);border-color:var(--hk-pink)">保存</button>
+      </div>
     </div>
   </div>
 
@@ -1368,13 +1443,54 @@ document.getElementById('calNext').onclick = ()=>{
 };
 
 /* ===== 运动打卡模块 ===== */
+const KITTY_EMOJIS = ['🏃','💪','🧘','🚴','🏊','⚽','🏀','🤸','跳绳','散步'];
+let sportWeekOffset = 0;       // 0 = current week, -1 = prev, 1 = next
+let editingCheckinId = null;
+let sportSelectedEmoji = '🏃';
+let sportSelectedFreq = 3;
+
 function getTodayCheckins(){
   return state.checkinLogs[todayStr()] || [];
 }
 
 function isAllDone(){
   if(state.checkins.length===0) return true;
-  return getTodayCheckins().length === state.checkins.length;
+  return getTodayCheckins().length >= state.checkins.length;
+}
+
+/* 获取某周（offset 周）的周一到周日的日期数组 */
+function getWeekDates(offset){
+  const now = new Date();
+  const day = now.getDay(); // 0=Sun..6=Sat
+  // 周一为一周起点：周一 = now - (day-1)，day=0(Sun) 时差 6 天
+  const diffToMon = day === 0 ? -6 : 1 - day;
+  const monday = new Date(now);
+  monday.setDate(now.getDate() + diffToMon + offset * 7);
+  monday.setHours(0,0,0,0);
+  const dates = [];
+  for(let i=0; i<7; i++){
+    const d = new Date(monday);
+    d.setDate(monday.getDate() + i);
+    dates.push(d);
+  }
+  return dates;
+}
+
+function dateToStr(d){
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+
+/* 某天是否全部任务完成 */
+function isDayAllDone(dateStr){
+  if(state.checkins.length===0) return false;
+  const logs = state.checkinLogs[dateStr] || [];
+  return logs.length >= state.checkins.length;
+}
+
+/* 某天是否有打卡记录 */
+function isDayChecked(dateStr){
+  const logs = state.checkinLogs[dateStr] || [];
+  return logs.length > 0;
 }
 
 function renderCheckins(){
@@ -1389,10 +1505,14 @@ function renderCheckins(){
     let html = '';
     state.checkins.forEach(c=>{
       const checked = done.includes(c.id);
+      const freq = c.freq || 1;
       html += `<div class="checkin-item${checked?' done':''}">
         <div class="checkin-cb${checked?' checked':''}" data-cid="${c.id}">${checked?'✓':''}</div>
         <span class="checkin-emoji">${c.emoji||'✅'}</span>
-        <span class="checkin-title">${esc(c.title)}</span>
+        <div class="checkin-info">
+          <div class="checkin-title">${esc(c.title)}</div>
+          <div class="checkin-freq">每周${freq}次</div>
+        </div>
         <div class="checkin-actions">
           <button data-edit="${c.id}" title="编辑">✏️</button>
           <button data-del="${c.id}" title="删除">🗑</button>
@@ -1400,7 +1520,7 @@ function renderCheckins(){
       </div>`;
     });
     list.innerHTML = html;
-    // 勾选事件
+    // 勾选事件（今日）
     list.querySelectorAll('.checkin-cb').forEach(cb=>{
       cb.onclick = async ()=>{
         const cid = cb.dataset.cid;
@@ -1418,7 +1538,7 @@ function renderCheckins(){
     });
     // 编辑
     list.querySelectorAll('[data-edit]').forEach(btn=>{
-      btn.onclick = (ev)=>{ ev.stopPropagation(); editCheckin(btn.dataset.edit); };
+      btn.onclick = (ev)=>{ ev.stopPropagation(); openSportModal(btn.dataset.edit); };
     });
     // 删除
     list.querySelectorAll('[data-del]').forEach(btn=>{
@@ -1426,74 +1546,179 @@ function renderCheckins(){
     });
   }
   renderKitty();
-  renderHistory();
+  renderStats();
+  renderWeekStrip();
 }
 
 function renderKitty(){
-  const face = document.getElementById('kittyFace');
+  const wrap = document.getElementById('kittyImgWrap');
   const progress = document.getElementById('kittyProgress');
   const done = getTodayCheckins().length;
   const total = state.checkins.length;
   if(total===0){
-    face.classList.add('grey');
+    wrap.classList.add('grey');
     progress.innerHTML = '还没有打卡项哦～';
     return;
   }
-  if(done===total){
-    face.classList.remove('grey');
+  if(done>=total){
+    wrap.classList.remove('grey');
     progress.innerHTML = `今日全部完成 <span class="done">🎉 ${done}/${total}</span>`;
   } else {
-    face.classList.add('grey');
+    wrap.classList.add('grey');
     progress.innerHTML = `今日打卡 <span class="undone">${done}/${total}</span> 加油！`;
   }
 }
 
-function renderHistory(){
-  const hlist = document.getElementById('histList');
-  const dates = Object.keys(state.checkinLogs).sort((a,b)=>b.localeCompare(a)).slice(0,7);
-  const total = state.checkins.length;
-  if(dates.length===0 || total===0){ hlist.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:8px 0">暂无记录</div>'; return; }
+function renderStats(){
+  document.getElementById('statTotal').textContent = state.checkins.length;
+  document.getElementById('statDone').textContent = getTodayCheckins().length;
+  // 历史任务 = 有打卡记录的不同天数
+  const histDays = Object.keys(state.checkinLogs).filter(d=>(state.checkinLogs[d]||[]).length>0).length;
+  document.getElementById('statHistory').textContent = histDays;
+}
+
+function renderWeekStrip(){
+  const grid = document.getElementById('hkWeekGrid');
+  const title = document.getElementById('wkTitle');
+  const dates = getWeekDates(sportWeekOffset);
+  const today = todayStr();
+  const dows = ['周一','周二','周三','周四','周五','周六','周日'];
+  // 标题：显示该周范围
+  const start = dates[0], end = dates[6];
+  title.textContent = `${start.getMonth()+1}/${start.getDate()} - ${end.getMonth()+1}/${end.getDate()}`;
   let html = '';
-  dates.forEach(d=>{
-    const cnt = (state.checkinLogs[d]||[]).length;
-    const pct = total>0 ? cnt/total*100 : 0;
-    const allDone = cnt===total;
-    html += `<div class="hist-item">
-      <span class="hist-date">${d.slice(5)}</span>
-      <div class="hist-bar"><div class="hist-fill" style="width:${pct}%"></div></div>
-      <span class="hist-num">${cnt}/${total}</span>
-      <span class="hist-emoji">${allDone?'🎉':''}</span>
+  dates.forEach((d, i)=>{
+    const ds = dateToStr(d);
+    const isToday = ds === today;
+    const checked = isDayChecked(ds);
+    const allDone = isDayAllDone(ds);
+    const isPast = d < new Date(today+'T00:00:00');
+    const classes = ['hk-day'];
+    if(isToday) classes.push('today');
+    // 判断是否本周以内（用于显示样式，不做 other-month）
+    html += `<div class="${classes.join(' ')}" data-date="${ds}">
+      <span class="hk-date">${d.getMonth()+1}/${d.getDate()}</span>
+      <span class="hk-dow">${dows[i]}</span>
+      <div class="hk-day-circle${checked?' checked':''}">${checked?'✓':''}</div>
     </div>`;
   });
-  hlist.innerHTML = html;
+  grid.innerHTML = html;
+  // 点击日期：切换当天打卡状态
+  // 点击逻辑：如果当天有任务未全完成 -> 将所有未完成任务标记完成；如果已全完成 -> 清空当天记录
+  grid.querySelectorAll('.hk-day').forEach(el=>{
+    el.onclick = async ()=>{
+      const ds = el.dataset.date;
+      if(state.checkins.length===0){ toast('请先添加打卡项'); return; }
+      const logs = state.checkinLogs[ds] || [];
+      if(logs.length >= state.checkins.length){
+        // 全部完成 -> 清空
+        delete state.checkinLogs[ds];
+      } else {
+        // 标记全部完成
+        state.checkinLogs[ds] = state.checkins.map(c=>c.id);
+      }
+      await saveConfig();
+      renderCheckins();
+    };
+  });
 }
 
-document.getElementById('btnAddCheckin').onclick = ()=>{
-  const title = prompt('输入打卡内容（如：跑步30分钟）：');
-  if(!title || !title.trim()) return;
-  const emoji = prompt('选一个 emoji（可选，如 🏃）：') || '✅';
-  state.checkins.push({ id: uid(), title: title.trim(), emoji: emoji.trim() || '✅' });
-  saveConfig().then(()=>renderCheckins());
+/* 弹窗 */
+function openSportModal(editId){
+  editingCheckinId = editId || null;
+  const titleEl = document.getElementById('sportModalTitle');
+  if(editId){
+    const item = state.checkins.find(c=>c.id===editId);
+    titleEl.textContent = '编辑打卡项';
+    document.getElementById('sportTitle').value = item.title;
+    sportSelectedEmoji = item.emoji || '🏃';
+    sportSelectedFreq = item.freq || 3;
+  } else {
+    titleEl.textContent = '添加打卡项';
+    document.getElementById('sportTitle').value = '';
+    sportSelectedEmoji = '🏃';
+    sportSelectedFreq = 3;
+  }
+  renderEmojiPicker();
+  renderFreqPicker();
+  document.getElementById('sportModalMask').classList.add('show');
+  document.getElementById('sportTitle').focus();
+}
+
+function renderEmojiPicker(){
+  const row = document.getElementById('sportEmojiRow');
+  row.innerHTML = KITTY_EMOJIS.map(e=>
+    `<div class="emoji-pick${e===sportSelectedEmoji?' active':''}" data-emoji="${esc(e)}">${e}</div>`
+  ).join('');
+  row.querySelectorAll('.emoji-pick').forEach(el=>{
+    el.onclick = ()=>{
+      sportSelectedEmoji = el.dataset.emoji;
+      renderEmojiPicker();
+    };
+  });
+}
+
+function renderFreqPicker(){
+  const row = document.getElementById('sportFreqRow');
+  let html = '';
+  for(let i=1; i<=7; i++){
+    html += `<div class="freq-btn${i===sportSelectedFreq?' active':''}" data-freq="${i}">${i}</div>`;
+  }
+  row.innerHTML = html;
+  row.querySelectorAll('.freq-btn').forEach(el=>{
+    el.onclick = ()=>{
+      sportSelectedFreq = parseInt(el.dataset.freq);
+      renderFreqPicker();
+    };
+  });
+}
+
+document.getElementById('btnAddCheckin').onclick = ()=>openSportModal(null);
+
+document.getElementById('sportModalCancel').onclick = ()=>{
+  document.getElementById('sportModalMask').classList.remove('show');
 };
 
-function editCheckin(id){
-  const item = state.checkins.find(c=>c.id===id);
-  if(!item) return;
-  const title = prompt('修改内容：', item.title);
-  if(title && title.trim()) item.title = title.trim();
-  const emoji = prompt('修改 emoji（可选）：', item.emoji);
-  if(emoji) item.emoji = emoji.trim() || '✅';
-  saveConfig().then(()=>renderCheckins());
-}
+document.getElementById('sportModalSave').onclick = async ()=>{
+  const title = document.getElementById('sportTitle').value.trim();
+  if(!title){ toast('请输入项目名称'); return; }
+  if(editingCheckinId){
+    const item = state.checkins.find(c=>c.id===editingCheckinId);
+    if(item){
+      item.title = title;
+      item.emoji = sportSelectedEmoji;
+      item.freq = sportSelectedFreq;
+    }
+  } else {
+    state.checkins.push({
+      id: uid(), title, emoji: sportSelectedEmoji, freq: sportSelectedFreq
+    });
+  }
+  await saveConfig();
+  document.getElementById('sportModalMask').classList.remove('show');
+  renderCheckins();
+  toast('已保存');
+};
+
+document.getElementById('sportModalMask').onclick = ev=>{
+  if(ev.target.id==='sportModalMask') document.getElementById('sportModalMask').classList.remove('show');
+};
+
+document.getElementById('wkPrev').onclick = ()=>{ sportWeekOffset--; renderWeekStrip(); };
+document.getElementById('wkNext').onclick = ()=>{ sportWeekOffset++; renderWeekStrip(); };
 
 function deleteCheckin(id){
-  if(!confirm('删除这个打卡项？')) return;
-  state.checkins = state.checkins.filter(c=>c.id!==id);
-  // 清理日志中该项
-  Object.keys(state.checkinLogs).forEach(d=>{
-    state.checkinLogs[d] = state.checkinLogs[d].filter(cid=>cid!==id);
+  confirmModal('删除', '确定删除这个打卡项？', async ()=>{
+    state.checkins = state.checkins.filter(c=>c.id!==id);
+    // 清理日志中该项
+    Object.keys(state.checkinLogs).forEach(d=>{
+      state.checkinLogs[d] = state.checkinLogs[d].filter(cid=>cid!==id);
+      if(state.checkinLogs[d].length===0) delete state.checkinLogs[d];
+    });
+    await saveConfig();
+    renderCheckins();
+    toast('已删除');
   });
-  saveConfig().then(()=>renderCheckins());
 }
 
 /* ===== 事件绑定 ===== */
