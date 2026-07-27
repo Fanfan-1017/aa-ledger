@@ -446,6 +446,7 @@
   .checkin-item.A.done{background:#ffe4ec;border-color:var(--sp-pink2)}
   .checkin-item.B{background:var(--sp-blue-card);border-color:var(--sp-blue-border)}
   .checkin-item.B.done{background:#dbeafe;border-color:var(--sp-blue2)}
+  .checkin-item.neutral.done{background:var(--green-bg);border-color:var(--green)}
   .checkin-cb{
     width:24px;height:24px;border-radius:50%;border:2px solid;
     display:flex;align-items:center;justify-content:center;cursor:pointer;
@@ -456,6 +457,8 @@
   .checkin-cb.A.checked{background:var(--sp-pink);border-color:var(--sp-pink)}
   .checkin-cb.B{border-color:var(--sp-blue)}
   .checkin-cb.B.checked{background:var(--sp-blue);border-color:var(--sp-blue)}
+  .checkin-cb.neutral{border-color:var(--text3)}
+  .checkin-cb.neutral.checked{background:var(--green);border-color:var(--green)}
   .checkin-emoji{font-size:18px;flex-shrink:0}
   .checkin-info{flex:1;min-width:0}
   .checkin-title{font-size:14px;color:var(--text);font-weight:500}
@@ -507,6 +510,27 @@
     -webkit-tap-highlight-color:transparent;
   }
   .sport-modal .freq-btn.active{background:var(--sp-pink);border-color:var(--sp-pink);color:#fff;font-weight:600}
+
+  /* 历史记录弹窗 */
+  .hk-stat-card.clickable{cursor:pointer;transition:all 0.12s;-webkit-tap-highlight-color:transparent}
+  .hk-stat-card.clickable:active{transform:scale(0.96)}
+  .history-modal{max-height:80vh;overflow-y:auto}
+  .history-section{margin-bottom:16px}
+  .history-section-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+  .history-item{
+    display:flex;align-items:center;gap:8px;padding:8px 10px;
+    border-radius:var(--radius-sm);margin-bottom:4px;font-size:13px;
+  }
+  .history-item .h-emoji{font-size:16px;flex-shrink:0}
+  .history-item .h-name{flex:1;color:var(--text)}
+  .history-item .h-count{font-weight:600;color:var(--text2)}
+  .history-week-item{
+    display:flex;align-items:center;gap:8px;padding:6px 10px;font-size:13px;
+  }
+  .history-week-item .h-emoji{font-size:15px}
+  .history-week-item .h-name{flex:1;color:var(--text2)}
+  .history-week-item .h-count{font-weight:600;color:var(--text)}
+  .history-empty{text-align:center;color:var(--text3);font-size:13px;padding:20px}
 </style>
 </head>
 <body>
@@ -598,7 +622,7 @@
           <div class="stat-num" id="homeStatDone">0</div>
           <div class="stat-label">已完成</div>
         </div>
-        <div class="hk-stat-card">
+        <div class="hk-stat-card clickable" id="homeHistCard">
           <div class="stat-num" id="homeStatHistory">0</div>
           <div class="stat-label">历史任务</div>
         </div>
@@ -633,7 +657,7 @@
           <div class="stat-num" id="aStatDone">0</div>
           <div class="stat-label">已完成</div>
         </div>
-        <div class="hk-stat-card">
+        <div class="hk-stat-card clickable" id="aHistCard">
           <div class="stat-num" id="aStatHistory">0</div>
           <div class="stat-label">历史任务</div>
         </div>
@@ -668,7 +692,7 @@
           <div class="stat-num" id="bStatDone">0</div>
           <div class="stat-label">已完成</div>
         </div>
-        <div class="hk-stat-card">
+        <div class="hk-stat-card clickable" id="bHistCard">
           <div class="stat-num" id="bStatHistory">0</div>
           <div class="stat-label">历史任务</div>
         </div>
@@ -709,6 +733,17 @@
       <div class="actions">
         <button id="sportModalCancel">取消</button>
         <button class="primary" id="sportModalSave" style="background:var(--sp-pink);border-color:var(--sp-pink)">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 历史记录弹窗 -->
+  <div class="modal-mask" id="historyModalMask">
+    <div class="modal history-modal">
+      <h3 id="historyModalTitle">历史记录</h3>
+      <div id="historyModalBody"></div>
+      <div class="actions">
+        <button class="primary" id="historyModalClose">关闭</button>
       </div>
     </div>
   </div>
@@ -1733,11 +1768,21 @@ function renderPageStats(page, dataKey){
   const histEl = document.getElementById(prefix+'StatHistory');
   if(!totalEl) return;
   const tasks = state.checkins[dataKey] || [];
+  // 「已完成」统计本周（周一到今天）打卡总次数
+  const weekDates = getWeekDates(0);
   const today = todayStr();
-  const done = (state.checkinLogs[dataKey]||{})[today] || [];
-  const histDays = Object.keys(state.checkinLogs[dataKey]||{}).filter(d=>(state.checkinLogs[dataKey][d]||[]).length>0).length;
+  let weekDoneCount = 0;
+  const logs = state.checkinLogs[dataKey] || {};
+  weekDates.forEach(d=>{
+    const ds = dateToStr(d);
+    if(ds <= today){
+      weekDoneCount += (logs[ds] || []).length;
+    }
+  });
+  // 「历史任务」统计有打卡记录的总天数
+  const histDays = Object.keys(logs).filter(d=>(logs[d]||[]).length>0).length;
   totalEl.textContent = tasks.length;
-  doneEl.textContent = done.length;
+  doneEl.textContent = weekDoneCount;
   histEl.textContent = histDays;
 }
 
@@ -1804,7 +1849,7 @@ function renderPageList(page, dataKey){
   if(empty) empty.style.display = 'none';
   const today = todayStr();
   const done = (state.checkinLogs[dataKey]||{})[today] || [];
-  const themeClass = page === 'home' ? '' : ' '+page;
+  const themeClass = page === 'home' ? ' neutral' : ' '+page;
   let html = '';
   tasks.forEach(c=>{
     const checked = done.includes(c.id);
@@ -1915,6 +1960,111 @@ function deleteCheckin(dataKey, id, page){
   });
 }
 
+/* ===== 历史记录统计 ===== */
+
+/* 计算历史统计数据 */
+function getHistoryStats(dataKey){
+  const tasks = state.checkins[dataKey] || [];
+  const logs = state.checkinLogs[dataKey] || {};
+  const taskMap = {};
+  tasks.forEach(t=>{ taskMap[t.id] = t; });
+
+  // 总次数
+  const totals = {};
+  // 按周分组：{weekKey: {start, end, items: {id: count}}}
+  const weeksMap = {};
+
+  Object.keys(logs).forEach(dateStr=>{
+    const ids = logs[dateStr] || [];
+    if(ids.length === 0) return;
+    // 计算这个日期属于哪个自然周
+    const d = new Date(dateStr + 'T00:00:00');
+    if(isNaN(d.getTime())) return;
+    const day = d.getDay();
+    const diffToMon = day === 0 ? -6 : 1 - day;
+    const monday = new Date(d);
+    monday.setDate(d.getDate() + diffToMon);
+    const sunday = new Date(monday);
+    sunday.setDate(monday.getDate() + 6);
+    const weekKey = dateToStr(monday);
+
+    if(!weeksMap[weekKey]){
+      weeksMap[weekKey] = { start: monday, end: sunday, items: {} };
+    }
+    ids.forEach(id=>{
+      totals[id] = (totals[id] || 0) + 1;
+      weeksMap[weekKey].items[id] = (weeksMap[weekKey].items[id] || 0) + 1;
+    });
+  });
+
+  // 按周排序（最近的在前）
+  const weeks = Object.values(weeksMap).sort((a,b)=>b.start - a.start);
+
+  return { totals, weeks, taskMap };
+}
+
+/* 显示历史弹窗 */
+function showHistoryModal(dataKey){
+  const titleEl = document.getElementById('historyModalTitle');
+  const bodyEl = document.getElementById('historyModalBody');
+  const name = dataKey === 'shared' ? '共同' : nameOf(dataKey);
+  titleEl.textContent = '历史记录 - ' + name;
+
+  const { totals, weeks, taskMap } = getHistoryStats(dataKey);
+  const tasks = state.checkins[dataKey] || [];
+  const today = todayStr();
+
+  let html = '';
+
+  // 上半部分：每个打卡项目总次数
+  if(tasks.length === 0){
+    html += '<div class="history-empty">还没有打卡项目</div>';
+  } else {
+    html += '<div class="history-section">';
+    html += '<div class="history-section-title">总计</div>';
+    tasks.forEach(t=>{
+      const count = totals[t.id] || 0;
+      html += `<div class="history-item">
+        <span class="h-emoji">${t.emoji || '✅'}</span>
+        <span class="h-name">${esc(t.title)}</span>
+        <span class="h-count">${count} 次</span>
+      </div>`;
+    });
+    html += '</div>';
+  }
+
+  // 下半部分：按周分组（最近4周）
+  if(weeks.length === 0){
+    html += '<div class="history-empty">还没有打卡记录</div>';
+  } else {
+    const recentWeeks = weeks.slice(0, 4);
+    recentWeeks.forEach(w=>{
+      const s = w.start, e = w.end;
+      const isThisWeek = dateToStr(s) === dateToStr(getWeekDates(0)[0]);
+      const weekLabel = isThisWeek ? '本周' : (dateToStr(e) < today ? '上周' : '');
+      html += '<div class="history-section">';
+      html += `<div class="history-section-title">${weekLabel} (${s.getMonth()+1}/${s.getDate()} - ${e.getMonth()+1}/${e.getDate()})</div>`;
+      Object.keys(w.items).forEach(id=>{
+        const task = taskMap[id];
+        const name = task ? task.title : '已删除项';
+        const emoji = task ? (task.emoji || '✅') : '❓';
+        html += `<div class="history-week-item">
+          <span class="h-emoji">${emoji}</span>
+          <span class="h-name">${esc(name)}</span>
+          <span class="h-count">×${w.items[id]}</span>
+        </div>`;
+      });
+      html += '</div>';
+    });
+    if(weeks.length > 4){
+      html += `<div class="history-empty">还有 ${weeks.length - 4} 周的历史记录</div>`;
+    }
+  }
+
+  bodyEl.innerHTML = html;
+  document.getElementById('historyModalMask').classList.add('show');
+}
+
 /* ===== 运动事件绑定 ===== */
 document.getElementById('sportAvatarA').onclick = ()=>{
   sportView = 'A';
@@ -1985,6 +2135,17 @@ document.getElementById('aWkPrev').onclick = ()=>{ aWeekOffset--; renderPageWeek
 document.getElementById('aWkNext').onclick = ()=>{ aWeekOffset++; renderPageWeek('A','A',aWeekOffset); };
 document.getElementById('bWkPrev').onclick = ()=>{ bWeekOffset--; renderPageWeek('B','B',bWeekOffset); };
 document.getElementById('bWkNext').onclick = ()=>{ bWeekOffset++; renderPageWeek('B','B',bWeekOffset); };
+
+// 历史记录卡片点击
+document.getElementById('homeHistCard').onclick = ()=>showHistoryModal('shared');
+document.getElementById('aHistCard').onclick = ()=>showHistoryModal('A');
+document.getElementById('bHistCard').onclick = ()=>showHistoryModal('B');
+document.getElementById('historyModalClose').onclick = ()=>{
+  document.getElementById('historyModalMask').classList.remove('show');
+};
+document.getElementById('historyModalMask').onclick = ev=>{
+  if(ev.target.id==='historyModalMask') document.getElementById('historyModalMask').classList.remove('show');
+};
 
 
 /* ===== 事件绑定 ===== */
