@@ -565,17 +565,20 @@ async function loadEntries(){
 }
 
 async function saveConfig(){
-  try{
-    await API.setConfig('names', state.names);
-    await API.setConfig('avatars', state.avatars);
-    await API.setConfig('settled', state.settled);
-    await API.setConfig('rate', state.rate);
-    await API.setConfig('rateAuto', state.rateAuto);
-    await API.setConfig('rateUpdated', state.rateUpdated);
-    await API.setConfig('customCats', state.customCats);
-    await API.setConfig('anniversaries', state.anniversaries);
-    await API.setConfig('plans', state.plans);
-  }catch(e){ console.warn('save config', e); }
+  const tasks = [
+    ['names', state.names],
+    ['avatars', state.avatars],
+    ['settled', state.settled],
+    ['rate', state.rate],
+    ['rateAuto', state.rateAuto],
+    ['rateUpdated', state.rateUpdated],
+    ['customCats', state.customCats],
+    ['anniversaries', state.anniversaries],
+    ['plans', state.plans],
+  ];
+  const results = await Promise.allSettled(tasks.map(([k,v])=>API.setConfig(k,v)));
+  const failed = results.filter(r=>r.status==='rejected');
+  if(failed.length) console.warn('save config partial fail', failed.length);
 }
 
 function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
