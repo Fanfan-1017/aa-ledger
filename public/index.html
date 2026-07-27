@@ -1827,8 +1827,10 @@ function renderPageWeek(page, dataKey, offset){
         if(!state.checkinLogs[dataKey]) state.checkinLogs[dataKey] = {};
         if(logs.length===0) delete state.checkinLogs[dataKey][ds];
         else state.checkinLogs[dataKey][ds] = logs;
-        await saveConfig();
+        // 乐观更新：立即重绘
         renderPageWeek(page, dataKey, offset);
+        renderPageStats(page, dataKey);
+        await saveConfig();
       };
     });
   }
@@ -1882,10 +1884,12 @@ function renderPageList(page, dataKey){
       }
       if(logs.length===0) delete state.checkinLogs[dataKey][today];
       else state.checkinLogs[dataKey][today] = logs;
-      await saveConfig();
+      // 乐观更新：立即重绘 UI
       renderPageList(page, dataKey);
       renderPageStats(page, dataKey);
       if(page === 'home') renderPageWeek('home', 'shared', homeWeekOffset);
+      // 再异步保存到服务器
+      await saveConfig();
     };
   });
   // 编辑
