@@ -6,6 +6,7 @@
     "setup": "node api/setup.js"
   },
   "dependencies": {
+    "@neondatabase/serverless": "^1.1.0",
     "@vercel/postgres": "^0.10.0"
   }
 }

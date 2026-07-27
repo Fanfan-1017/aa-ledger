@@ -1,13 +1,11 @@
-import { createPool } from '@vercel/postgres';
+import { neon } from '@neondatabase/serverless';
 
-const pool = createPool({
-  connectionString: process.env.POSTGRES_URL,
-});
+const sql = neon(process.env.POSTGRES_URL);
 
 export default async function handler(req, res) {
   try {
     if (req.method === 'GET') {
-      const { rows } = await pool.query('SELECT * FROM config');
+      const rows = await sql`SELECT * FROM config`;
       const cfg = {};
       rows.forEach(r => { cfg[r.key] = r.value; });
       return res.json(cfg);
@@ -16,10 +14,7 @@ export default async function handler(req, res) {
     if (req.method === 'POST') {
       const { key, value } = req.body || {};
       if (!key) return res.status(400).json({ error: '缺少 key' });
-      await pool.query(
-        'INSERT INTO config (key, value) VALUES ($1,$2) ON CONFLICT (key) DO UPDATE SET value=$2, updated_at=NOW()',
-        [key, value||'']
-      );
+      await sql`INSERT INTO config (key, value) VALUES (${key},${value||''}) ON CONFLICT (key) DO UPDATE SET value=${value||''}, updated_at=NOW()`;
       return res.json({ ok: true });
     }
 
