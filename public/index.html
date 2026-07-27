@@ -592,7 +592,7 @@
       <div class="hk-stats">
         <div class="hk-stat-card">
           <div class="stat-num" id="homeStatTotal">0</div>
-          <div class="stat-label">查看任务</div>
+          <div class="stat-label">任务数</div>
         </div>
         <div class="hk-stat-card">
           <div class="stat-num" id="homeStatDone">0</div>
@@ -627,7 +627,7 @@
       <div class="hk-stats">
         <div class="hk-stat-card">
           <div class="stat-num" id="aStatTotal">0</div>
-          <div class="stat-label">查看任务</div>
+          <div class="stat-label">任务数</div>
         </div>
         <div class="hk-stat-card">
           <div class="stat-num" id="aStatDone">0</div>
@@ -662,7 +662,7 @@
       <div class="hk-stats">
         <div class="hk-stat-card">
           <div class="stat-num" id="bStatTotal">0</div>
-          <div class="stat-label">查看任务</div>
+          <div class="stat-label">任务数</div>
         </div>
         <div class="hk-stat-card">
           <div class="stat-num" id="bStatDone">0</div>
@@ -902,9 +902,9 @@ async function loadConfig(){
         const c = JSON.parse(cfg.checkins);
         // 迁移旧格式：数组 -> {A:[...], B:[]}
         if(Array.isArray(c)){
-          state.checkins = {A:[...c], B:[]};
+          state.checkins = {A:[...c], B:[], shared:[]};
         } else {
-          state.checkins = {A: c.A||[], B: c.B||[]};
+          state.checkins = {A: c.A||[], B: c.B||[], shared: c.shared||[]};
         }
       }catch(e){}
     }
@@ -913,9 +913,9 @@ async function loadConfig(){
         const l = JSON.parse(cfg.checkinLogs);
         // 迁移旧格式：扁平对象 -> {A:{...}, B:{}}
         if(l && !l.A && !l.B){
-          state.checkinLogs = {A:{...l}, B:{}};
+          state.checkinLogs = {A:{...l}, B:{}, shared:{}};
         } else {
-          state.checkinLogs = {A: l.A||{}, B: l.B||{}};
+          state.checkinLogs = {A: l.A||{}, B: l.B||{}, shared: l.shared||{}};
         }
       }catch(e){}
     }
