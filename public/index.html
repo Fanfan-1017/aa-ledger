@@ -308,6 +308,75 @@
     font-size:14px;color:var(--text);outline:none;font-family:var(--font)
   }
   .plan-modal .form-row input:focus{border-color:var(--teal)}
+
+  /* ===== 运动打卡模块 (Hello Kitty 粉) ===== */
+  :root{
+    --hk-pink:#ff69b4; --hk-pink2:#ff85c0; --hk-bg:#fff0f5; --hk-card:#fff5f9;
+    --hk-border:#ffb6c1; --hk-text:#d63384; --hk-ribbon:#ff1493; --hk-grey:#c0c0c0;
+  }
+  .tab-btn.sport.active{color:var(--hk-pink)}
+
+  /* Kitty 猫头区域 */
+  .kitty-box{text-align:center;padding:20px 0 10px}
+  .kitty-face{
+    display:inline-block;position:relative;width:80px;height:80px;
+    transition:filter 0.3s;
+  }
+  .kitty-face.grey{filter:grayscale(100%);opacity:0.5}
+  .kitty-svg{width:100%;height:100%}
+  .kitty-ribbon{position:absolute;top:-6px;right:-10px;font-size:20px}
+  .kitty-progress{margin-top:8px;font-size:14px;color:var(--hk-text);font-weight:600}
+  .kitty-progress .done{color:var(--hk-pink);font-size:20px}
+  .kitty-progress .undone{color:var(--hk-grey)}
+
+  /* 打卡列表 */
+  .checkin-list{margin:10px 0}
+  .checkin-item{
+    display:flex;align-items:center;gap:10px;padding:12px 14px;
+    background:var(--hk-card);border:1px solid var(--hk-border);
+    border-radius:var(--radius);margin-bottom:8px;transition:all 0.12s;
+  }
+  .checkin-item.done{background:#ffe4ec;border-color:var(--hk-pink2)}
+  .checkin-cb{
+    width:24px;height:24px;border-radius:50%;border:2px solid var(--hk-pink);
+    display:flex;align-items:center;justify-content:center;cursor:pointer;
+    flex-shrink:0;font-size:14px;color:#fff;transition:all 0.15s;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .checkin-cb.checked{background:var(--hk-pink);border-color:var(--hk-pink)}
+  .checkin-emoji{font-size:18px;flex-shrink:0}
+  .checkin-title{flex:1;font-size:14px;color:var(--text);font-weight:500}
+  .checkin-item.done .checkin-title{color:var(--hk-text)}
+  .checkin-actions{display:flex;gap:2px;flex-shrink:0}
+  .checkin-actions button{
+    width:28px;height:28px;border-radius:50%;border:none;background:transparent;
+    cursor:pointer;font-size:14px;color:var(--text3);transition:all 0.12s;
+    display:flex;align-items:center;justify-content:center;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .checkin-actions button:hover{background:var(--hk-bg);color:var(--hk-pink)}
+
+  .add-checkin-btn{
+    display:block;width:100%;padding:12px;border:2px dashed var(--hk-border);
+    border-radius:var(--radius);background:transparent;color:var(--hk-pink);
+    font-size:14px;cursor:pointer;font-family:var(--font);text-align:center;
+    transition:all 0.12s;-webkit-tap-highlight-color:transparent;margin-bottom:14px;
+  }
+  .add-checkin-btn:active{background:var(--hk-bg)}
+
+  /* 历史记录 */
+  .checkin-history{margin-top:16px;padding-top:12px;border-top:1px solid var(--hk-border)}
+  .checkin-history .hist-head{font-size:13px;font-weight:600;color:var(--hk-text);margin-bottom:8px}
+  .hist-item{
+    display:flex;align-items:center;gap:8px;padding:6px 0;font-size:13px;color:var(--text2)
+  }
+  .hist-item .hist-date{font-weight:500;min-width:40px}
+  .hist-item .hist-bar{
+    flex:1;height:6px;background:var(--hk-bg);border-radius:3px;overflow:hidden
+  }
+  .hist-item .hist-fill{height:100%;border-radius:3px;background:var(--hk-pink);transition:width 0.3s}
+  .hist-item .hist-num{font-size:12px;color:var(--hk-text);font-weight:600;min-width:40px;text-align:right}
+  .hist-item .hist-emoji{font-size:14px}
 </style>
 </head>
 <body>
@@ -323,6 +392,7 @@
   <div class="tab-bar">
     <button class="tab-btn anni" data-tab="anniversary"><span class="tab-icon">💕</span>纪念日</button>
     <button class="tab-btn plan" data-tab="plan"><span class="tab-icon">📆</span>计划</button>
+    <button class="tab-btn sport" data-tab="sport"><span class="tab-icon">🏃</span>运动</button>
     <button class="tab-btn ledger active" data-tab="ledger"><span class="tab-icon">💰</span>记账</button>
   </div>
 
@@ -369,6 +439,50 @@
         <div id="planItems"></div>
         <div class="empty" id="planEmpty" style="display:none">本月暂无计划</div>
       </div>
+    </div>
+  </div>
+
+  <!-- ==================== 运动打卡面板 ==================== -->
+  <div class="tab-panel" id="panelSport">
+    <div class="kitty-box">
+      <div class="kitty-face" id="kittyFace">
+        <svg class="kitty-svg" viewBox="0 0 100 100">
+          <!-- 脸 -->
+          <ellipse cx="50" cy="55" rx="38" ry="34" fill="#fff" stroke="#ffb6c1" stroke-width="2"/>
+          <!-- 耳朵 -->
+          <polygon points="20,25 10,2 35,22" fill="#fff" stroke="#ffb6c1" stroke-width="2"/>
+          <polygon points="80,25 90,2 65,22" fill="#fff" stroke="#ffb6c1" stroke-width="2"/>
+          <polygon points="21,22 15,8 32,22" fill="#ffb6c1"/>
+          <polygon points="79,22 85,8 68,22" fill="#ffb6c1"/>
+          <!-- 眼睛 -->
+          <ellipse cx="38" cy="50" rx="5" ry="5.5" fill="#333"/>
+          <ellipse cx="62" cy="50" rx="5" ry="5.5" fill="#333"/>
+          <circle cx="39.5" cy="48.5" r="1.8" fill="#fff"/>
+          <circle cx="63.5" cy="48.5" r="1.8" fill="#fff"/>
+          <!-- 鼻子 -->
+          <ellipse cx="50" cy="58" rx="3" ry="2.5" fill="#ff69b4"/>
+          <!-- 胡须 -->
+          <line x1="20" y1="55" x2="36" y2="57" stroke="#bbb" stroke-width="1"/>
+          <line x1="20" y1="60" x2="36" y2="59" stroke="#bbb" stroke-width="1"/>
+          <line x1="80" y1="55" x2="64" y2="57" stroke="#bbb" stroke-width="1"/>
+          <line x1="80" y1="60" x2="64" y2="59" stroke="#bbb" stroke-width="1"/>
+          <!-- 嘴巴 -->
+          <line x1="47" y1="61" x2="50" y2="63" stroke="#ff69b4" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="53" y1="61" x2="50" y2="63" stroke="#ff69b4" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <span class="kitty-ribbon">🎀</span>
+      </div>
+      <div class="kitty-progress" id="kittyProgress">今日打卡 0/0</div>
+    </div>
+
+    <div class="checkin-list" id="checkinList"></div>
+    <div class="empty" id="checkinEmpty">还没有打卡项，点击下方添加</div>
+
+    <button class="add-checkin-btn" id="btnAddCheckin">+ 添加打卡项</button>
+
+    <div class="checkin-history" id="checkinHistory">
+      <div class="hist-head">📋 最近记录</div>
+      <div id="histList"></div>
     </div>
   </div>
 
@@ -535,6 +649,8 @@ let state = {
   customCats: ['吃饭','便利店','超市','家用','娱乐'],
   anniversaries: [],
   plans: [],
+  checkins: [],
+  checkinLogs: {},
 };
 
 let pollTimer = null;
@@ -554,6 +670,8 @@ async function loadConfig(){
     if(cfg.customCats){ try{ state.customCats = JSON.parse(cfg.customCats); }catch(e){} }
     if(cfg.anniversaries){ try{ state.anniversaries = JSON.parse(cfg.anniversaries); }catch(e){} }
     if(cfg.plans){ try{ state.plans = JSON.parse(cfg.plans); }catch(e){} }
+    if(cfg.checkins){ try{ state.checkins = JSON.parse(cfg.checkins); }catch(e){} }
+    if(cfg.checkinLogs){ try{ state.checkinLogs = JSON.parse(cfg.checkinLogs); }catch(e){} }
   }catch(e){ console.warn('load config', e); }
 }
 
@@ -575,6 +693,8 @@ async function saveConfig(){
     ['customCats', state.customCats],
     ['anniversaries', state.anniversaries],
     ['plans', state.plans],
+    ['checkins', state.checkins],
+    ['checkinLogs', state.checkinLogs],
   ];
   const results = await Promise.allSettled(tasks.map(([k,v])=>API.setConfig(k,v)));
   const failed = results.filter(r=>r.status==='rejected');
@@ -601,6 +721,7 @@ function switchTab(tab){
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.toggle('active', p.id==='panel'+tab.charAt(0).toUpperCase()+tab.slice(1)));
   if(tab==='anniversary') renderAnniversaries();
   if(tab==='plan') renderCalendar();
+  if(tab==='sport') renderCheckins();
 }
 
 document.querySelectorAll('.tab-btn').forEach(btn=>{
@@ -642,9 +763,22 @@ async function poll(){
         if(JSON.stringify(p)!==JSON.stringify(state.plans)){ state.plans=p; cfgChanged=true; }
       }catch(e){}
     }
+    if(cfg.checkins){
+      try{
+        const c = JSON.parse(cfg.checkins);
+        if(JSON.stringify(c)!==JSON.stringify(state.checkins)){ state.checkins=c; cfgChanged=true; }
+      }catch(e){}
+    }
+    if(cfg.checkinLogs){
+      try{
+        const l = JSON.parse(cfg.checkinLogs);
+        if(JSON.stringify(l)!==JSON.stringify(state.checkinLogs)){ state.checkinLogs=l; cfgChanged=true; }
+      }catch(e){}
+    }
     if(cfgChanged){
       if(activeTab==='anniversary') renderAnniversaries();
       if(activeTab==='plan') renderCalendar();
+      if(activeTab==='sport') renderCheckins();
     }
     document.getElementById('syncDot').classList.remove('off');
   }catch(e){
@@ -1233,6 +1367,135 @@ document.getElementById('calNext').onclick = ()=>{
   renderCalendar();
 };
 
+/* ===== 运动打卡模块 ===== */
+function getTodayCheckins(){
+  return state.checkinLogs[todayStr()] || [];
+}
+
+function isAllDone(){
+  if(state.checkins.length===0) return true;
+  return getTodayCheckins().length === state.checkins.length;
+}
+
+function renderCheckins(){
+  const list = document.getElementById('checkinList');
+  const empty = document.getElementById('checkinEmpty');
+  if(state.checkins.length===0){
+    list.innerHTML = '';
+    empty.style.display = 'block';
+  } else {
+    empty.style.display = 'none';
+    const done = getTodayCheckins();
+    let html = '';
+    state.checkins.forEach(c=>{
+      const checked = done.includes(c.id);
+      html += `<div class="checkin-item${checked?' done':''}">
+        <div class="checkin-cb${checked?' checked':''}" data-cid="${c.id}">${checked?'✓':''}</div>
+        <span class="checkin-emoji">${c.emoji||'✅'}</span>
+        <span class="checkin-title">${esc(c.title)}</span>
+        <div class="checkin-actions">
+          <button data-edit="${c.id}" title="编辑">✏️</button>
+          <button data-del="${c.id}" title="删除">🗑</button>
+        </div>
+      </div>`;
+    });
+    list.innerHTML = html;
+    // 勾选事件
+    list.querySelectorAll('.checkin-cb').forEach(cb=>{
+      cb.onclick = async ()=>{
+        const cid = cb.dataset.cid;
+        const today = todayStr();
+        let logs = state.checkinLogs[today] || [];
+        if(logs.includes(cid)){
+          logs = logs.filter(id=>id!==cid);
+        } else {
+          logs = [...logs, cid];
+        }
+        state.checkinLogs[today] = logs;
+        await saveConfig();
+        renderCheckins();
+      };
+    });
+    // 编辑
+    list.querySelectorAll('[data-edit]').forEach(btn=>{
+      btn.onclick = (ev)=>{ ev.stopPropagation(); editCheckin(btn.dataset.edit); };
+    });
+    // 删除
+    list.querySelectorAll('[data-del]').forEach(btn=>{
+      btn.onclick = (ev)=>{ ev.stopPropagation(); deleteCheckin(btn.dataset.del); };
+    });
+  }
+  renderKitty();
+  renderHistory();
+}
+
+function renderKitty(){
+  const face = document.getElementById('kittyFace');
+  const progress = document.getElementById('kittyProgress');
+  const done = getTodayCheckins().length;
+  const total = state.checkins.length;
+  if(total===0){
+    face.classList.add('grey');
+    progress.innerHTML = '还没有打卡项哦～';
+    return;
+  }
+  if(done===total){
+    face.classList.remove('grey');
+    progress.innerHTML = `今日全部完成 <span class="done">🎉 ${done}/${total}</span>`;
+  } else {
+    face.classList.add('grey');
+    progress.innerHTML = `今日打卡 <span class="undone">${done}/${total}</span> 加油！`;
+  }
+}
+
+function renderHistory(){
+  const hlist = document.getElementById('histList');
+  const dates = Object.keys(state.checkinLogs).sort((a,b)=>b.localeCompare(a)).slice(0,7);
+  const total = state.checkins.length;
+  if(dates.length===0 || total===0){ hlist.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:8px 0">暂无记录</div>'; return; }
+  let html = '';
+  dates.forEach(d=>{
+    const cnt = (state.checkinLogs[d]||[]).length;
+    const pct = total>0 ? cnt/total*100 : 0;
+    const allDone = cnt===total;
+    html += `<div class="hist-item">
+      <span class="hist-date">${d.slice(5)}</span>
+      <div class="hist-bar"><div class="hist-fill" style="width:${pct}%"></div></div>
+      <span class="hist-num">${cnt}/${total}</span>
+      <span class="hist-emoji">${allDone?'🎉':''}</span>
+    </div>`;
+  });
+  hlist.innerHTML = html;
+}
+
+document.getElementById('btnAddCheckin').onclick = ()=>{
+  const title = prompt('输入打卡内容（如：跑步30分钟）：');
+  if(!title || !title.trim()) return;
+  const emoji = prompt('选一个 emoji（可选，如 🏃）：') || '✅';
+  state.checkins.push({ id: uid(), title: title.trim(), emoji: emoji.trim() || '✅' });
+  saveConfig().then(()=>renderCheckins());
+};
+
+function editCheckin(id){
+  const item = state.checkins.find(c=>c.id===id);
+  if(!item) return;
+  const title = prompt('修改内容：', item.title);
+  if(title && title.trim()) item.title = title.trim();
+  const emoji = prompt('修改 emoji（可选）：', item.emoji);
+  if(emoji) item.emoji = emoji.trim() || '✅';
+  saveConfig().then(()=>renderCheckins());
+}
+
+function deleteCheckin(id){
+  if(!confirm('删除这个打卡项？')) return;
+  state.checkins = state.checkins.filter(c=>c.id!==id);
+  // 清理日志中该项
+  Object.keys(state.checkinLogs).forEach(d=>{
+    state.checkinLogs[d] = state.checkinLogs[d].filter(cid=>cid!==id);
+  });
+  saveConfig().then(()=>renderCheckins());
+}
+
 /* ===== 事件绑定 ===== */
 document.getElementById('payerBtnA').onclick = ()=>selectPayer('A');
 document.getElementById('payerBtnB').onclick = ()=>selectPayer('B');
@@ -1366,6 +1629,7 @@ if('serviceWorker' in navigator){
   initCalendar();
   renderAnniversaries();
   renderCalendar();
+  renderCheckins();
   fetchRate().then(async r=>{ if(r && state.rateAuto){ state.rate=r; await saveConfig(); renderLedgerAll(); } });
   startPolling();
 })();
