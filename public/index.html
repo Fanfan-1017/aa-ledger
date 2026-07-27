@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="AA记账">
-<meta name="theme-color" content="#f5f5f5">
+<meta name="apple-mobile-web-app-title" content="小窝">
+<meta name="theme-color" content="#fdf2f8">
 <link rel="manifest" href="/manifest.json">
-<title>AA 记账</title>
+<title>小窝</title>
 <style>
   :root{
     --bg:#f5f5f5; --card:#fff; --border:#e8e8e8;
@@ -17,29 +17,55 @@
     --red:#ef4444; --red-bg:#fef2f2; --green:#10b981; --green-bg:#ecfdf5;
     --orange:#f59e0b; --orange-bg:#fffbeb;
     --purple:#8b5cf6; --purple-bg:#f5f3ff;
+    --pink:#ec4899; --pink-bg:#fdf2f8; --pink-light:#fce7f3;
+    --teal:#14b8a6; --teal-bg:#f0fdfa; --teal-light:#ccfbf1;
     --radius:10px; --radius-sm:6px;
     --font:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;
     --safe-bottom:env(safe-area-inset-bottom,0px);
   }
   *{box-sizing:border-box;margin:0;padding:0}
-  body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:15px;line-height:1.5;padding:20px 16px calc(60px + var(--safe-bottom))}
+  body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:15px;line-height:1.5;padding:16px 12px calc(20px + var(--safe-bottom))}
   .wrap{max-width:720px;margin:0 auto}
 
-  header{margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
-  header h1{font-size:20px;font-weight:700}
-  header .sync-dot{width:8px;height:8px;border-radius:50%;background:var(--green);display:inline-block;margin-right:4px}
-  header .sync-dot.off{background:var(--text3)}
-  header .rate-box{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text2);background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:5px 10px}
-  header .rate-box input{width:60px;border:none;background:transparent;font-size:13px;color:var(--text);text-align:center;outline:none;font-family:var(--font)}
-  header .rate-box input:focus{border-bottom:1px solid var(--blue)}
-  header .rate-box .rate-src{font-size:11px;color:var(--text3);cursor:pointer}
-  header .rate-box .rate-src.locked{color:var(--orange)}
+  /* ===== 顶部标题 ===== */
+  .app-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px}
+  .app-header h1{font-size:18px;font-weight:700;display:flex;align-items:center;gap:6px}
+  .app-header .sync-dot{width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block;flex-shrink:0}
+  .app-header .sync-dot.off{background:var(--text3)}
 
-  .today-bar{display:flex;align-items:center;gap:10px;margin-bottom:18px;font-size:13px;color:var(--text2);flex-wrap:wrap}
+  /* ===== 标签栏 ===== */
+  .tab-bar{display:flex;gap:0;margin-bottom:16px;background:var(--bg);border-radius:var(--radius);padding:3px;border:1px solid var(--border)}
+  .tab-btn{
+    flex:1;padding:10px 8px;border:none;border-radius:8px;background:transparent;
+    cursor:pointer;font-size:14px;font-weight:500;color:var(--text2);
+    text-align:center;transition:all 0.15s;font-family:var(--font);
+    -webkit-tap-highlight-color:transparent;display:flex;align-items:center;justify-content:center;gap:4px
+  }
+  .tab-btn.active{background:var(--card);color:var(--text);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,0.08)}
+  .tab-btn .tab-icon{font-size:15px}
+  .tab-btn.anni.active{color:var(--pink)}
+  .tab-btn.plan.active{color:var(--teal)}
+  .tab-btn.ledger.active{color:var(--blue)}
+
+  /* ===== 内容面板 ===== */
+  .tab-panel{display:none}
+  .tab-panel.active{display:block}
+
+  /* ===== 汇率栏（记账标签内） ===== */
+  .rate-bar{display:flex;align-items:center;gap:8px;margin-bottom:14px;font-size:13px;color:var(--text2);flex-wrap:wrap}
+  .rate-box{display:flex;align-items:center;gap:4px;font-size:12px;color:var(--text2);background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:4px 8px}
+  .rate-box input{width:56px;border:none;background:transparent;font-size:12px;color:var(--text);text-align:center;outline:none;font-family:var(--font)}
+  .rate-box input:focus{border-bottom:1px solid var(--blue)}
+  .rate-box .rate-src{font-size:10px;color:var(--text3);cursor:pointer}
+  .rate-box .rate-src.locked{color:var(--orange)}
+
+  /* ===== 通用卡片 ===== */
+  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:14px}
+
+  .today-bar{display:flex;align-items:center;gap:10px;margin-bottom:14px;font-size:13px;color:var(--text2);flex-wrap:wrap}
   .today-bar .val{font-weight:600;color:var(--text)}
 
-  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:16px}
-
+  /* ===== 记账模块 ===== */
   .quick-entry{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
   @media(max-width:420px){.quick-entry{grid-template-columns:1fr}}
 
@@ -134,6 +160,7 @@
   .cat-summary .bar-wrap{width:60px;height:6px;background:var(--bg);border-radius:3px;display:inline-block;vertical-align:middle;margin-right:6px}
   .cat-summary .bar-fill{height:100%;border-radius:3px;background:var(--blue)}
 
+  /* 记录列表 */
   .list-table{width:100%;border-collapse:collapse;font-size:14px}
   .list-table th{text-align:left;padding:8px 10px;color:var(--text3);font-weight:400;font-size:12px;border-bottom:1px solid var(--border)}
   .list-table td{padding:10px;border-bottom:1px solid var(--border);vertical-align:middle}
@@ -150,6 +177,102 @@
   .month-head .sub{font-weight:400;font-size:12px;color:var(--text3);margin-left:auto}
   .settled-tag{font-size:11px;padding:2px 8px;border-radius:10px;background:var(--green-bg);color:var(--green);margin-left:6px}
 
+  .list-toggle{display:flex;align-items:center;justify-content:center;gap:6px;padding:8px;font-size:13px;color:var(--text2);cursor:pointer;-webkit-tap-highlight-color:transparent;border-top:1px dashed var(--border);margin-top:8px}
+  .list-toggle .arrow{font-size:12px;transition:transform 0.2s}
+  .list-toggle.open .arrow{transform:rotate(180deg)}
+
+  /* ===== 纪念日模块 ===== */
+  .section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+  .section-head .title{font-size:15px;font-weight:600;color:var(--text)}
+  .section-head .add-btn{
+    padding:6px 14px;border:1px solid var(--pink);border-radius:20px;background:var(--pink-bg);
+    color:var(--pink);font-size:13px;cursor:pointer;font-family:var(--font);
+    transition:all 0.12s;-webkit-tap-highlight-color:transparent;
+  }
+  .section-head .add-btn:active{background:var(--pink-light)}
+
+  .anni-card{
+    display:flex;align-items:center;gap:12px;padding:14px;background:var(--card);
+    border:1px solid var(--border);border-radius:var(--radius);margin-bottom:10px;
+    transition:all 0.12s;
+  }
+  .anni-card .icon{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+  .anni-card .icon.birthday{background:var(--pink-light);color:var(--pink)}
+  .anni-card .icon.love{background:#fee2e2;color:var(--red)}
+  .anni-card .icon.other{background:var(--purple-bg);color:var(--purple)}
+  .anni-card .info{flex:1;min-width:0}
+  .anni-card .info .name{font-weight:600;font-size:14px;color:var(--text)}
+  .anni-card .info .date-str{font-size:12px;color:var(--text2);margin-top:2px}
+  .anni-card .info .countdown{font-size:13px;color:var(--pink);font-weight:500;margin-top:2px}
+  .anni-card .info .countdown.past{color:var(--text3)}
+  .anni-card .del-btn{
+    border:none;background:none;color:var(--text3);font-size:18px;cursor:pointer;
+    padding:4px 8px;border-radius:var(--radius-sm);transition:all 0.12s;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .anni-card .del-btn:hover{color:var(--red);background:var(--red-bg)}
+
+  .anni-form{display:none;background:var(--card);border:1px solid var(--pink-light);border-radius:var(--radius);padding:14px;margin-bottom:14px}
+  .anni-form.show{display:block}
+  .anni-form .form-row{display:flex;gap:8px;margin-bottom:8px}
+  .anni-form input,.anni-form select{
+    padding:10px;border:1px solid var(--border);border-radius:var(--radius-sm);
+    font-size:14px;color:var(--text);outline:none;font-family:var(--font);flex:1
+  }
+  .anni-form input:focus,.anni-form select:focus{border-color:var(--pink)}
+  .anni-form .form-actions{display:flex;gap:8px;justify-content:flex-end}
+  .anni-form .form-actions button{
+    padding:8px 16px;border-radius:var(--radius-sm);font-size:13px;cursor:pointer;font-family:var(--font)
+  }
+  .anni-form .save-btn{background:var(--pink);border:none;color:#fff;font-weight:600}
+  .anni-form .cancel-btn{background:var(--card);border:1px solid var(--border);color:var(--text2)}
+
+  /* ===== 日历模块 ===== */
+  .cal-nav{display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:12px}
+  .cal-nav .cal-month{font-size:16px;font-weight:600;min-width:100px;text-align:center}
+  .cal-nav .cal-arrow{
+    width:32px;height:32px;border-radius:50%;border:1px solid var(--border);background:var(--card);
+    cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;
+    color:var(--text2);transition:all 0.12s;-webkit-tap-highlight-color:transparent;
+    font-family:var(--font);
+  }
+  .cal-nav .cal-arrow:active{background:var(--bg)}
+
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;text-align:center;margin-bottom:4px}
+  .cal-grid .cal-dow{font-size:11px;color:var(--text3);padding:6px 0;font-weight:500}
+  .cal-grid .cal-day{
+    aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    border-radius:var(--radius-sm);cursor:pointer;font-size:14px;color:var(--text);
+    position:relative;transition:all 0.12s;-webkit-tap-highlight-color:transparent;
+  }
+  .cal-grid .cal-day:hover{background:var(--bg)}
+  .cal-grid .cal-day.empty{cursor:default}
+  .cal-grid .cal-day.empty:hover{background:transparent}
+  .cal-grid .cal-day.today{background:var(--teal-bg);color:var(--teal);font-weight:700}
+  .cal-grid .cal-day.has-plan{font-weight:600}
+  .cal-grid .cal-day .plan-dot{
+    width:5px;height:5px;border-radius:50%;background:var(--teal);
+    position:absolute;bottom:4px;
+  }
+  .cal-grid .cal-day.today .plan-dot{background:var(--teal)}
+  .cal-grid .cal-day.other-month{color:var(--text3)}
+
+  .plan-list{margin-top:14px;padding-top:12px;border-top:1px solid var(--border)}
+  .plan-list .plan-head{font-size:13px;font-weight:600;color:var(--text2);margin-bottom:8px}
+  .plan-item{
+    display:flex;align-items:center;gap:10px;padding:10px 12px;
+    background:var(--teal-bg);border-radius:var(--radius-sm);margin-bottom:6px;
+    font-size:14px;
+  }
+  .plan-item .plan-date{font-size:12px;color:var(--teal);font-weight:600;white-space:nowrap}
+  .plan-item .plan-title{flex:1;color:var(--text);font-weight:500}
+  .plan-item .plan-desc{font-size:12px;color:var(--text2)}
+  .plan-item .plan-del{
+    border:none;background:none;color:var(--text3);font-size:16px;cursor:pointer;
+    padding:2px 6px;-webkit-tap-highlight-color:transparent;
+  }
+
+  /* 底部 */
   footer{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;font-size:12px;color:var(--text3);margin-top:20px;padding-top:12px;border-top:1px solid var(--border)}
   footer .btns{display:flex;gap:4px}
   footer button{padding:4px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--card);color:var(--text2);font-size:12px;cursor:pointer;font-family:var(--font);transition:all 0.12s}
@@ -166,114 +289,181 @@
   .modal .actions{display:flex;gap:8px;justify-content:flex-end}
   .modal button{padding:7px 16px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--card);color:var(--text);font-size:14px;cursor:pointer;font-family:var(--font)}
   .modal button.danger{background:var(--red);border-color:var(--red);color:#fff}
+  .modal button.primary{background:var(--blue);border-color:var(--blue);color:#fff}
 
   .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--text);color:#fff;padding:8px 18px;border-radius:20px;font-size:13px;z-index:1001;opacity:0;transition:opacity 0.2s;pointer-events:none}
   .toast.show{opacity:1}
 
-  .install-banner{display:none;background:var(--blue);color:#fff;text-align:center;padding:12px 16px;font-size:14px;cursor:pointer;border-radius:var(--radius);margin-bottom:16px}
+  .install-banner{display:none;background:var(--pink);color:#fff;text-align:center;padding:12px 16px;font-size:14px;cursor:pointer;border-radius:var(--radius);margin-bottom:14px}
   .install-banner.show{display:block}
 
-  /* 列表折叠 */
-  .list-toggle{display:flex;align-items:center;justify-content:center;gap:6px;padding:8px;font-size:13px;color:var(--text2);cursor:pointer;-webkit-tap-highlight-color:transparent;border-top:1px dashed var(--border);margin-top:8px}
-  .list-toggle .arrow{font-size:12px;transition:transform 0.2s}
-  .list-toggle.open .arrow{transform:rotate(180deg)}
+  .plan-modal .form-row{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+  .plan-modal .form-row label{font-size:13px;color:var(--text2);font-weight:500}
+  .plan-modal .form-row input{
+    padding:10px;border:1px solid var(--border);border-radius:var(--radius-sm);
+    font-size:14px;color:var(--text);outline:none;font-family:var(--font)
+  }
+  .plan-modal .form-row input:focus{border-color:var(--teal)}
 </style>
 </head>
 <body>
 <div class="wrap">
 
-  <header>
-    <h1><span class="sync-dot" id="syncDot" title="同步状态"></span>AA 记账</h1>
-    <div class="rate-box">
-      <span style="font-size:12px">1 JPY </span>
-      <input type="number" id="rateInput" step="0.0001" min="0.001" value="0.0482">
-      <span style="font-size:12px">RMB</span>
-      <span class="rate-src" id="rateSrc" title="点击切换自动/手动">auto</span>
-    </div>
+  <header class="app-header">
+    <h1><span class="sync-dot" id="syncDot" title="同步状态"></span>🏠 小窝</h1>
   </header>
 
-  <div class="install-banner" id="installBanner">📱 添加到桌面，像 App 一样使用</div>
-  <div class="today-bar" id="todayBar"></div>
+  <div class="install-banner" id="installBanner">💕 添加到桌面，随时打开小窝</div>
 
-  <section>
-    <div class="quick-entry">
-      <button class="payer-btn" id="payerBtnA">
-        <span class="avatar a">👤</span>
-        <span id="payerLabelA">帆帆</span>
-      </button>
-      <button class="payer-btn" id="payerBtnB">
-        <span class="avatar b">👤</span>
-        <span id="payerLabelB">源源</span>
-      </button>
+  <!-- 标签栏 -->
+  <div class="tab-bar">
+    <button class="tab-btn anni" data-tab="anniversary"><span class="tab-icon">💕</span>纪念日</button>
+    <button class="tab-btn plan" data-tab="plan"><span class="tab-icon">📆</span>计划</button>
+    <button class="tab-btn ledger active" data-tab="ledger"><span class="tab-icon">💰</span>记账</button>
+  </div>
+
+  <!-- ==================== 纪念日面板 ==================== -->
+  <div class="tab-panel" id="panelAnniversary">
+    <div class="section-head">
+      <span class="title">纪念日</span>
+      <button class="add-btn" id="btnAddAnni">+ 添加</button>
     </div>
 
-    <div class="card entry-form" id="entryForm">
-      <div class="currency-row">
-        <button class="currency-btn active" data-curr="CNY">¥ RMB</button>
-        <button class="currency-btn" data-curr="JPY">￥ 日元</button>
+    <div class="anni-form" id="anniForm">
+      <div class="form-row">
+        <input type="text" id="anniTitle" placeholder="标题，如：在一起的日子" maxlength="20">
       </div>
-      <div class="amount-row">
-        <input type="number" id="amountInput" step="0.01" min="0.01" placeholder="输入金额" inputmode="decimal">
-        <div class="cny-preview" id="cnyPreview"></div>
+      <div class="form-row">
+        <input type="date" id="anniDate">
+        <select id="anniType">
+          <option value="love">💕 纪念日</option>
+          <option value="birthday">🎂 生日</option>
+          <option value="other">📌 其他</option>
+        </select>
       </div>
-      <div class="cat-row" id="catRow">
-        <button class="cat-btn" data-cat="吃饭">吃饭</button>
-        <button class="cat-btn" data-cat="便利店">便利店</button>
-        <button class="cat-btn" data-cat="超市">超市</button>
-        <button class="cat-btn" data-cat="家用">家用</button>
-        <button class="cat-btn" data-cat="娱乐">娱乐</button>
-        <button class="cat-btn custom" data-cat="__custom__">+ 自定义</button>
-      </div>
-      <div class="submit-row">
-        <input type="date" id="dateInput">
-        <button class="submit-btn" id="submitBtn">记一笔</button>
+      <div class="form-actions">
+        <button class="cancel-btn" id="btnCancelAnni">取消</button>
+        <button class="save-btn" id="btnSaveAnni">保存</button>
       </div>
     </div>
-  </section>
 
-  <section>
+    <div id="anniList"></div>
+    <div class="empty" id="anniEmpty">还没有纪念日，点击上方添加</div>
+  </div>
+
+  <!-- ==================== 计划面板 ==================== -->
+  <div class="tab-panel" id="panelPlan">
     <div class="card">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap">
-        <span style="font-weight:600;font-size:15px">月度结算</span>
-        <select id="settleMonth" style="padding:5px 8px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:var(--font);color:var(--text);outline:none"></select>
-        <span id="settledTag" class="settled-tag" style="display:none">已结算</span>
-        <button id="btnMarkSettled" style="margin-left:auto;padding:4px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--card);font-size:12px;color:var(--text2);cursor:pointer;font-family:var(--font)">标记已结算</button>
-        <button id="btnUnmarkSettled" style="margin-left:auto;padding:4px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--card);font-size:12px;color:var(--text2);cursor:pointer;font-family:var(--font);display:none">取消结算</button>
+      <div class="cal-nav">
+        <button class="cal-arrow" id="calPrev">‹</button>
+        <span class="cal-month" id="calMonthLabel"></span>
+        <button class="cal-arrow" id="calNext">›</button>
       </div>
-      <div class="settle-grid" id="settleGrid"></div>
-      <div class="settle-total" id="settleTotal"></div>
-      <div id="verdictBox"></div>
-      <div class="rate-info" id="rateInfo"></div>
+      <div class="cal-grid" id="calGrid"></div>
+      <div class="plan-list" id="planList">
+        <div class="plan-head" id="planListHead"></div>
+        <div id="planItems"></div>
+        <div class="empty" id="planEmpty" style="display:none">本月暂无计划</div>
+      </div>
+    </div>
+  </div>
 
-      <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border)">
-        <div id="catSummaryToggle" style="font-size:13px;font-weight:600;color:var(--text2);display:flex;align-items:center;justify-content:space-between;cursor:pointer;-webkit-tap-highlight-color:transparent">
-          <span>分类统计</span>
-          <span id="catSummaryArrow" style="font-size:16px;transition:transform 0.2s">▸</span>
+  <!-- ==================== 记账面板 ==================== -->
+  <div class="tab-panel active" id="panelLedger">
+
+    <div class="rate-bar">
+      <div class="rate-box">
+        <span style="font-size:12px">1 JPY</span>
+        <input type="number" id="rateInput" step="0.0001" min="0.001" value="0.0482">
+        <span style="font-size:12px">RMB</span>
+        <span class="rate-src" id="rateSrc" title="点击切换自动/手动">auto</span>
+      </div>
+    </div>
+
+    <div class="today-bar" id="todayBar"></div>
+
+    <section>
+      <div class="quick-entry">
+        <button class="payer-btn" id="payerBtnA">
+          <span class="avatar a">👤</span>
+          <span id="payerLabelA">帆帆</span>
+        </button>
+        <button class="payer-btn" id="payerBtnB">
+          <span class="avatar b">👤</span>
+          <span id="payerLabelB">源源</span>
+        </button>
+      </div>
+
+      <div class="card entry-form" id="entryForm">
+        <div class="currency-row">
+          <button class="currency-btn active" data-curr="CNY">¥ RMB</button>
+          <button class="currency-btn" data-curr="JPY">￥ 日元</button>
         </div>
-        <div class="cat-summary" id="catSummary" style="display:none;margin-top:8px"></div>
+        <div class="amount-row">
+          <input type="number" id="amountInput" step="0.01" min="0.01" placeholder="输入金额" inputmode="decimal">
+          <div class="cny-preview" id="cnyPreview"></div>
+        </div>
+        <div class="cat-row" id="catRow">
+          <button class="cat-btn" data-cat="吃饭">吃饭</button>
+          <button class="cat-btn" data-cat="便利店">便利店</button>
+          <button class="cat-btn" data-cat="超市">超市</button>
+          <button class="cat-btn" data-cat="家用">家用</button>
+          <button class="cat-btn" data-cat="娱乐">娱乐</button>
+          <button class="cat-btn custom" data-cat="__custom__">+ 自定义</button>
+        </div>
+        <div class="submit-row">
+          <input type="date" id="dateInput">
+          <button class="submit-btn" id="submitBtn">记一笔</button>
+        </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <section>
-    <div style="font-weight:600;font-size:15px;margin-bottom:10px">记录</div>
-    <div class="card">
-      <div class="empty" id="emptyHint">还没有记录，点上方按钮开始记账</div>
-      <div id="listContainer"></div>
-    </div>
-  </section>
+    <section>
+      <div class="card">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+          <span style="font-weight:600;font-size:15px">月度结算</span>
+          <select id="settleMonth" style="padding:5px 8px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:var(--font);color:var(--text);outline:none"></select>
+          <span id="settledTag" class="settled-tag" style="display:none">已结算</span>
+          <button id="btnMarkSettled" style="margin-left:auto;padding:4px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--card);font-size:12px;color:var(--text2);cursor:pointer;font-family:var(--font)">标记已结算</button>
+          <button id="btnUnmarkSettled" style="margin-left:auto;padding:4px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--card);font-size:12px;color:var(--text2);cursor:pointer;font-family:var(--font);display:none">取消结算</button>
+        </div>
+        <div class="settle-grid" id="settleGrid"></div>
+        <div class="settle-total" id="settleTotal"></div>
+        <div id="verdictBox"></div>
+        <div class="rate-info" id="rateInfo"></div>
 
-  <footer>
-    <span id="statusLine">共 <span id="recCount">0</span> 条记录 · 云端同步</span>
-    <span class="btns">
-      <button id="btnExport">导出</button>
-      <button id="btnImport">导入</button>
-      <button class="danger" id="btnClear">清空</button>
-      <input type="file" id="fileImport" accept=".json" style="display:none">
-    </span>
-  </footer>
+        <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border)">
+          <div id="catSummaryToggle" style="font-size:13px;font-weight:600;color:var(--text2);display:flex;align-items:center;justify-content:space-between;cursor:pointer;-webkit-tap-highlight-color:transparent">
+            <span>分类统计</span>
+            <span id="catSummaryArrow" style="font-size:16px;transition:transform 0.2s">▸</span>
+          </div>
+          <div class="cat-summary" id="catSummary" style="display:none;margin-top:8px"></div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div style="font-weight:600;font-size:15px;margin-bottom:10px">记录</div>
+      <div class="card">
+        <div class="empty" id="emptyHint">还没有记录，点上方按钮开始记账</div>
+        <div id="listContainer"></div>
+      </div>
+    </section>
+
+    <footer>
+      <span id="statusLine">共 <span id="recCount">0</span> 条记录 · 云端同步</span>
+      <span class="btns">
+        <button id="btnExport">导出</button>
+        <button id="btnImport">导入</button>
+        <button class="danger" id="btnClear">清空</button>
+        <input type="file" id="fileImport" accept=".json" style="display:none">
+      </span>
+    </footer>
+  </div>
+
 </div>
 
+<!-- 通用弹窗 -->
 <div class="modal-mask" id="modalMask">
   <div class="modal">
     <h3 id="modalTitle"></h3>
@@ -284,6 +474,30 @@
     </div>
   </div>
 </div>
+
+<!-- 计划弹窗 -->
+<div class="modal-mask" id="planModalMask">
+  <div class="modal plan-modal">
+    <h3 id="planModalTitle">添加计划</h3>
+    <div class="form-row">
+      <label>日期</label>
+      <input type="date" id="planDate">
+    </div>
+    <div class="form-row">
+      <label>标题</label>
+      <input type="text" id="planTitle" placeholder="如：迪士尼乐园" maxlength="30">
+    </div>
+    <div class="form-row">
+      <label>备注（可选）</label>
+      <input type="text" id="planDesc" placeholder="如：提前买票，8点出发" maxlength="100">
+    </div>
+    <div class="actions">
+      <button id="planModalCancel">取消</button>
+      <button class="primary" id="planModalSave">保存</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -306,6 +520,8 @@ let state = {
   rateAuto: true,
   rateUpdated: '',
   customCats: ['吃饭','便利店','超市','家用','娱乐'],
+  anniversaries: [],
+  plans: [],
 };
 
 let pollTimer = null;
@@ -322,6 +538,8 @@ async function loadConfig(){
     if(cfg.rateAuto) state.rateAuto = cfg.rateAuto === 'true';
     if(cfg.rateUpdated) state.rateUpdated = cfg.rateUpdated;
     if(cfg.customCats){ try{ state.customCats = JSON.parse(cfg.customCats); }catch(e){} }
+    if(cfg.anniversaries){ try{ state.anniversaries = JSON.parse(cfg.anniversaries); }catch(e){} }
+    if(cfg.plans){ try{ state.plans = JSON.parse(cfg.plans); }catch(e){} }
   }catch(e){ console.warn('load config', e); }
 }
 
@@ -340,6 +558,8 @@ async function saveConfig(){
     await API.setConfig('rateAuto', state.rateAuto);
     await API.setConfig('rateUpdated', state.rateUpdated);
     await API.setConfig('customCats', state.customCats);
+    await API.setConfig('anniversaries', state.anniversaries);
+    await API.setConfig('plans', state.plans);
   }catch(e){ console.warn('save config', e); }
 }
 
@@ -354,21 +574,59 @@ function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;
 function nameOf(p){ return state.names[p]||p; }
 function cnyAmount(e){ return e.currency==='CNY' ? e.amount : e.amount * state.rate; }
 
+/* ===== 标签切换 ===== */
+let activeTab = 'ledger';
+
+function switchTab(tab){
+  activeTab = tab;
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active', b.dataset.tab===tab));
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.toggle('active', p.id==='panel'+tab.charAt(0).toUpperCase()+tab.slice(1)));
+  if(tab==='anniversary') renderAnniversaries();
+  if(tab==='plan') renderCalendar();
+}
+
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.onclick = ()=>switchTab(btn.dataset.tab);
+});
+
 /* ===== 轮询同步 ===== */
 async function poll(){
   if(polling) return;
   polling = true;
   try{
+    // 同步记账
     const fresh = await API.getEntries();
     const oldIds = new Set(state.entries.map(e=>e.id));
     const newIds = new Set(fresh.map(e=>e.id));
-    if(oldIds.size !== newIds.size || [...oldIds].some(id=>!newIds.has(id)) || [...newIds].some(id=>!oldIds.has(id))){
+    let changed = oldIds.size !== newIds.size || [...oldIds].some(id=>!newIds.has(id)) || [...newIds].some(id=>!oldIds.has(id));
+    if(changed){
       state.entries = fresh;
       lastSync = Date.now();
-      renderList();
-      renderSettleMonth();
-      renderToday();
-      updateCount();
+      if(activeTab==='ledger'){
+        renderList();
+        renderSettleMonth();
+        renderToday();
+        updateCount();
+      }
+    }
+    // 同步 config（纪念日、计划）
+    const cfg = await API.getConfig();
+    let cfgChanged = false;
+    if(cfg.anniversaries){
+      try{
+        const a = JSON.parse(cfg.anniversaries);
+        if(JSON.stringify(a)!==JSON.stringify(state.anniversaries)){ state.anniversaries=a; cfgChanged=true; }
+      }catch(e){}
+    }
+    if(cfg.plans){
+      try{
+        const p = JSON.parse(cfg.plans);
+        if(JSON.stringify(p)!==JSON.stringify(state.plans)){ state.plans=p; cfgChanged=true; }
+      }catch(e){}
+    }
+    if(cfgChanged){
+      if(activeTab==='anniversary') renderAnniversaries();
+      if(activeTab==='plan') renderCalendar();
     }
     document.getElementById('syncDot').classList.remove('off');
   }catch(e){
@@ -410,7 +668,8 @@ function renderRate(){
   } else {
     src.textContent = 'locked'; src.className = 'rate-src locked'; src.title = '已锁定 · 点击恢复自动';
   }
-  document.getElementById('rateInfo').textContent =
+  const ri = document.getElementById('rateInfo');
+  if(ri) ri.textContent =
     `汇率: 1 JPY = ¥${state.rate.toFixed(4)} RMB · ${state.rateAuto ? '自动获取' : '手动锁定'}${state.rateUpdated ? ' · '+state.rateUpdated : ''}`;
 }
 
@@ -441,7 +700,7 @@ function selectPayer(p){
 
 function selectCurrency(c){
   activeCurrency = c;
-  document.querySelectorAll('.currency-btn').forEach(b=>b.classList.toggle('active', b.dataset.curr===c));
+  document.querySelectorAll('#panelLedger .currency-btn').forEach(b=>b.classList.toggle('active', b.dataset.curr===c));
   updateCnyPreview();
   document.getElementById('amountInput').focus();
 }
@@ -510,7 +769,7 @@ async function submitEntry(){
     activeCategory = '';
     renderCatBtns();
     updateCnyPreview();
-    renderAll();
+    renderLedgerAll();
     toast('已记录');
   }catch(e){ toast('记录失败'); }
   btn.disabled = false;
@@ -520,10 +779,12 @@ async function submitEntry(){
 function renderToday(){
   const today = todayStr();
   const items = state.entries.filter(e=>e.date===today);
-  if(items.length===0){ document.getElementById('todayBar').innerHTML = ''; return; }
+  const bar = document.getElementById('todayBar');
+  if(!bar) return;
+  if(items.length===0){ bar.innerHTML = ''; return; }
   const tA = items.filter(e=>e.payer==='A').reduce((s,e)=>s+cnyAmount(e),0);
   const tB = items.filter(e=>e.payer==='B').reduce((s,e)=>s+cnyAmount(e),0);
-  document.getElementById('todayBar').innerHTML =
+  bar.innerHTML =
     `今日 <span class="val">¥${fmtMoney(tA+tB)} RMB</span>（${esc(nameOf('A'))} ¥${fmtMoney(tA)} RMB + ${esc(nameOf('B'))} ¥${fmtMoney(tB)} RMB）`;
 }
 
@@ -626,7 +887,7 @@ function renderList(){
     btn.onclick = async ev=>{
       const id = ev.target.closest('tr').dataset.id;
       confirmModal('删除', '确定删除这条记录？', async ()=>{
-        try{ await API.delEntry(id); state.entries = await API.getEntries(); renderAll(); toast('已删除'); }
+        try{ await API.delEntry(id); state.entries = await API.getEntries(); renderLedgerAll(); toast('已删除'); }
         catch(e){ toast('删除失败'); }
       });
     };
@@ -638,7 +899,7 @@ function renderList(){
 
 function updateCount(){ document.getElementById('recCount').textContent = state.entries.length; }
 
-function renderAll(){
+function renderLedgerAll(){
   renderPayerBtns();
   renderRate();
   renderToday();
@@ -648,10 +909,261 @@ function renderAll(){
   updateCount();
 }
 
-/* ===== 事件 ===== */
+/* ===== 纪念日模块 ===== */
+function calcCountdown(dateStr){
+  const now = new Date(); now.setHours(0,0,0,0);
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const parts = dateStr.split('-');
+  const month = parseInt(parts[1])-1, day = parseInt(parts[2]);
+  let target = new Date(today.getFullYear(), month, day);
+  if(target < today) target = new Date(today.getFullYear()+1, month, day);
+  const diffDays = Math.ceil((target - today) / (1000*60*60*24));
+  return { days: diffDays, isPast: diffDays < 0 };
+}
+
+function calcYearsSince(dateStr){
+  const parts = dateStr.split('-');
+  const then = new Date(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
+  const now = new Date();
+  let years = now.getFullYear() - then.getFullYear();
+  const mDiff = now.getMonth() - then.getMonth();
+  if(mDiff < 0 || (mDiff===0 && now.getDate() < then.getDate())) years--;
+  const lastAnni = new Date(now.getFullYear(), then.getMonth(), then.getDate());
+  if(lastAnni > now) lastAnni.setFullYear(lastAnni.getFullYear()-1);
+  const daysSince = Math.floor((now - lastAnni) / (1000*60*60*24));
+  return { years, days: daysSince };
+}
+
+function renderAnniversaries(){
+  const list = document.getElementById('anniList');
+  const empty = document.getElementById('anniEmpty');
+  if(state.anniversaries.length===0){
+    list.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+  const sorted = [...state.anniversaries].sort((a,b)=>{
+    const ca = calcCountdown(a.date), cb = calcCountdown(b.date);
+    return ca.days - cb.days;
+  });
+  let html = '';
+  sorted.forEach(a=>{
+    let iconClass = 'other', iconEmoji = '📌';
+    if(a.type==='birthday'){ iconClass='birthday'; iconEmoji='🎂'; }
+    else if(a.type==='love'){ iconClass='love'; iconEmoji='💕'; }
+    const cd = calcCountdown(a.date);
+    const ys = calcYearsSince(a.date);
+    let cdText;
+    if(a.type==='birthday'){
+      cdText = cd.days===0 ? '🎉 就是今天！生日快乐！' : `还有 ${cd.days} 天过生日`;
+    } else if(cd.days===0){
+      cdText = `🎉 就是今天！已 ${ys.years} 年`;
+    } else if(cd.days < 365){
+      cdText = `还有 ${cd.days} 天 · 已 ${ys.years} 年 ${ys.days} 天`;
+    } else {
+      cdText = `已 ${ys.years} 年 ${ys.days} 天`;
+    }
+    const cdClass = cd.days > 365 ? 'past' : '';
+    const dateLabel = a.type==='birthday' ? a.date.slice(5) : a.date;
+    html += `<div class="anni-card">
+      <div class="icon ${iconClass}">${iconEmoji}</div>
+      <div class="info">
+        <div class="name">${esc(a.title)}</div>
+        <div class="date-str">${dateLabel}</div>
+        <div class="countdown ${cdClass}">${cdText}</div>
+      </div>
+      <button class="del-btn" data-anni-id="${a.id}" title="删除">×</button>
+    </div>`;
+  });
+  list.innerHTML = html;
+  list.querySelectorAll('.del-btn').forEach(btn=>{
+    btn.onclick = async ()=>{
+      const id = btn.dataset.anniId;
+      if(!confirm('确定删除这个纪念日？')) return;
+      state.anniversaries = state.anniversaries.filter(a=>a.id!==id);
+      await saveConfig();
+      renderAnniversaries();
+    };
+  });
+}
+
+document.getElementById('btnAddAnni').onclick = ()=>{
+  document.getElementById('anniForm').classList.toggle('show');
+  document.getElementById('anniDate').value = todayStr();
+  document.getElementById('anniTitle').value = '';
+  document.getElementById('anniTitle').focus();
+};
+
+document.getElementById('btnCancelAnni').onclick = ()=>{
+  document.getElementById('anniForm').classList.remove('show');
+};
+
+document.getElementById('btnSaveAnni').onclick = async ()=>{
+  const title = document.getElementById('anniTitle').value.trim();
+  const date = document.getElementById('anniDate').value;
+  const type = document.getElementById('anniType').value;
+  if(!title){ toast('请输入标题'); return; }
+  if(!date){ toast('请选择日期'); return; }
+  state.anniversaries.push({ id: uid(), title, date, type });
+  await saveConfig();
+  document.getElementById('anniForm').classList.remove('show');
+  renderAnniversaries();
+  toast('已添加');
+};
+
+/* ===== 计划日历模块 ===== */
+let calYear, calMonth;
+
+function initCalendar(){
+  const now = new Date();
+  calYear = now.getFullYear();
+  calMonth = now.getMonth() + 1;
+}
+
+function getPlansForMonth(y, m){
+  const prefix = `${y}-${String(m).padStart(2,'0')}`;
+  return state.plans.filter(p=>p.date.startsWith(prefix));
+}
+
+function getPlanDates(y, m){
+  const prefix = `${y}-${String(m).padStart(2,'0')}`;
+  return new Set(state.plans.filter(p=>p.date.startsWith(prefix)).map(p=>p.date));
+}
+
+function renderCalendar(){
+  document.getElementById('calMonthLabel').textContent = `${calYear}年 ${calMonth}月`;
+  const planDates = getPlanDates(calYear, calMonth);
+  const today = todayStr();
+  const grid = document.getElementById('calGrid');
+  const dows = ['日','一','二','三','四','五','六'];
+  let html = dows.map(d=>`<div class="cal-dow">${d}</div>`).join('');
+  const firstDay = new Date(calYear, calMonth-1, 1).getDay();
+  const daysInMonth = new Date(calYear, calMonth, 0).getDate();
+  const daysInPrev = new Date(calYear, calMonth-1, 0).getDate();
+  // 上月填充
+  for(let i=firstDay-1; i>=0; i--){
+    const d = daysInPrev - i;
+    html += `<div class="cal-day empty other-month">${d}</div>`;
+  }
+  // 本月
+  for(let d=1; d<=daysInMonth; d++){
+    const ds = `${calYear}-${String(calMonth).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const classes = ['cal-day'];
+    if(ds===today) classes.push('today');
+    if(planDates.has(ds)) classes.push('has-plan');
+    html += `<div class="${classes.join(' ')}" data-date="${ds}">${d}${planDates.has(ds)?'<span class="plan-dot"></span>':''}</div>`;
+  }
+  // 下月填充
+  const totalCells = firstDay + daysInMonth;
+  const remaining = totalCells % 7 === 0 ? 0 : 7 - (totalCells % 7);
+  for(let d=1; d<=remaining; d++){
+    html += `<div class="cal-day empty other-month">${d}</div>`;
+  }
+  grid.innerHTML = html;
+
+  // 日期点击
+  grid.querySelectorAll('.cal-day:not(.empty)').forEach(cell=>{
+    cell.onclick = ()=>{
+      const ds = cell.dataset.date;
+      openPlanModal(ds);
+    };
+  });
+
+  // 当月计划列表
+  const monthPlans = getPlansForMonth(calYear, calMonth);
+  document.getElementById('planListHead').textContent = `📋 ${calMonth}月计划`;
+  const itemsDiv = document.getElementById('planItems');
+  const emptyDiv = document.getElementById('planEmpty');
+  if(monthPlans.length===0){
+    itemsDiv.innerHTML = '';
+    emptyDiv.style.display = 'block';
+  } else {
+    emptyDiv.style.display = 'none';
+    itemsDiv.innerHTML = monthPlans.map(p=>`
+      <div class="plan-item">
+        <span class="plan-date">${p.date.slice(5)}</span>
+        <span class="plan-title">${esc(p.title)}</span>
+        ${p.desc ? `<span class="plan-desc">${esc(p.desc)}</span>` : ''}
+        <button class="plan-del" data-plan-id="${p.id}">×</button>
+      </div>
+    `).join('');
+    itemsDiv.querySelectorAll('.plan-del').forEach(btn=>{
+      btn.onclick = async (ev)=>{
+        ev.stopPropagation();
+        const id = btn.dataset.planId;
+        if(!confirm('删除这个计划？')) return;
+        state.plans = state.plans.filter(p=>p.id!==id);
+        await saveConfig();
+        renderCalendar();
+      };
+    });
+  }
+}
+
+// 计划弹窗
+let editingPlanId = null;
+
+function openPlanModal(dateStr){
+  document.getElementById('planDate').value = dateStr;
+  document.getElementById('planTitle').value = '';
+  document.getElementById('planDesc').value = '';
+  editingPlanId = null;
+  // 检查是否已有计划
+  const existing = state.plans.filter(p=>p.date===dateStr);
+  if(existing.length>0){
+    document.getElementById('planModalTitle').textContent = `${dateStr} 的计划`;
+    // 显示已有计划，可编辑第一个
+    const ep = existing[0];
+    document.getElementById('planTitle').value = ep.title;
+    document.getElementById('planDesc').value = ep.desc || '';
+    editingPlanId = ep.id;
+  } else {
+    document.getElementById('planModalTitle').textContent = '添加计划';
+  }
+  document.getElementById('planModalMask').classList.add('show');
+  document.getElementById('planTitle').focus();
+}
+
+document.getElementById('planModalCancel').onclick = ()=>{
+  document.getElementById('planModalMask').classList.remove('show');
+};
+
+document.getElementById('planModalSave').onclick = async ()=>{
+  const date = document.getElementById('planDate').value;
+  const title = document.getElementById('planTitle').value.trim();
+  const desc = document.getElementById('planDesc').value.trim();
+  if(!date || !title){ toast('请填写日期和标题'); return; }
+  if(editingPlanId){
+    // 更新已有计划
+    const p = state.plans.find(p=>p.id===editingPlanId);
+    if(p){ p.title=title; p.desc=desc; }
+  } else {
+    state.plans.push({ id: uid(), date, title, desc });
+  }
+  await saveConfig();
+  document.getElementById('planModalMask').classList.remove('show');
+  renderCalendar();
+  toast('已保存');
+};
+
+document.getElementById('planModalMask').onclick = ev=>{
+  if(ev.target.id==='planModalMask') document.getElementById('planModalMask').classList.remove('show');
+};
+
+document.getElementById('calPrev').onclick = ()=>{
+  calMonth--; if(calMonth<1){ calMonth=12; calYear--; }
+  renderCalendar();
+};
+document.getElementById('calNext').onclick = ()=>{
+  calMonth++; if(calMonth>12){ calMonth=1; calYear++; }
+  renderCalendar();
+};
+
+/* ===== 事件绑定 ===== */
 document.getElementById('payerBtnA').onclick = ()=>selectPayer('A');
 document.getElementById('payerBtnB').onclick = ()=>selectPayer('B');
-document.querySelectorAll('.currency-btn').forEach(b=>b.onclick = ()=>selectCurrency(b.dataset.curr));
+document.querySelectorAll('#panelLedger .currency-btn').forEach(b=>b.onclick = ()=>selectCurrency(b.dataset.curr));
 
 document.getElementById('catRow').onclick = ev=>{
   const btn = ev.target.closest('.cat-btn');
@@ -669,11 +1181,11 @@ document.getElementById('submitBtn').onclick = submitEntry;
 
 document.getElementById('rateInput').oninput = async function(){
   const v=parseFloat(this.value);
-  if(v>0.001 && v<1){ state.rate=v; state.rateAuto=false; await saveConfig(); renderAll(); }
+  if(v>0.001 && v<1){ state.rate=v; state.rateAuto=false; await saveConfig(); renderLedgerAll(); }
 };
 document.getElementById('rateSrc').onclick = async function(){
   if(state.rateAuto){ state.rateAuto=false; await saveConfig(); renderRate(); }
-  else { state.rateAuto=true; const r=await fetchRate(); if(r){ state.rate=r; await saveConfig(); renderAll(); } else toast('获取汇率失败'); }
+  else { state.rateAuto=true; const r=await fetchRate(); if(r){ state.rate=r; await saveConfig(); renderLedgerAll(); } else toast('获取汇率失败'); }
 };
 
 document.getElementById('settleMonth').onchange = renderSettle;
@@ -702,7 +1214,7 @@ document.getElementById('catSummaryToggle').onclick = ()=>{
 document.getElementById('btnExport').onclick = ()=>{
   const blob = new Blob([JSON.stringify(state,null,2)],{type:'application/json'});
   const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
-  a.download=`aa_ledger_${todayStr()}.json`; a.click(); URL.revokeObjectURL(a.href);
+  a.download=`xiaowo_${todayStr()}.json`; a.click(); URL.revokeObjectURL(a.href);
   toast('已导出');
 };
 document.getElementById('btnImport').onclick = ()=>document.getElementById('fileImport').click();
@@ -718,7 +1230,7 @@ document.getElementById('fileImport').onchange = async ev=>{
           if(d.names){ state.names=d.names; await saveConfig(); }
           if(d.settled){ state.settled=d.settled; await saveConfig(); }
           if(d.customCats){ state.customCats=d.customCats; await saveConfig(); }
-          state.entries = await API.getEntries(); renderAll(); toast('导入成功');
+          state.entries = await API.getEntries(); renderLedgerAll(); toast('导入成功');
         }catch(e){ toast('导入失败'); }
       });
     }catch(err){ toast('导入失败: '+err.message); }
@@ -731,7 +1243,7 @@ document.getElementById('btnClear').onclick = ()=>{
   confirmModal('清空','将删除全部数据，不可撤销。',async ()=>{
     try{
       for(const e of state.entries){ await API.delEntry(e.id); }
-      state.entries=[]; state.settled={}; await saveConfig(); renderAll(); toast('已清空');
+      state.entries=[]; state.settled={}; await saveConfig(); renderLedgerAll(); toast('已清空');
     }catch(e){ toast('清空失败'); }
   });
 };
@@ -774,8 +1286,11 @@ if('serviceWorker' in navigator){
   await loadConfig();
   await loadEntries();
   document.getElementById('rateInput').value = state.rate.toFixed(4);
-  renderAll();
-  fetchRate().then(async r=>{ if(r && state.rateAuto){ state.rate=r; await saveConfig(); renderAll(); } });
+  renderLedgerAll();
+  initCalendar();
+  renderAnniversaries();
+  renderCalendar();
+  fetchRate().then(async r=>{ if(r && state.rateAuto){ state.rate=r; await saveConfig(); renderLedgerAll(); } });
   startPolling();
 })();
 </script>
