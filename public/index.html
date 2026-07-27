@@ -561,7 +561,27 @@
           <span class="sport-avatar-name A" id="sportNameA">帆帆</span>
         </button>
       </div>
-      <div class="sport-home-hint">点击名字进入编辑自己的打卡计划</div>
+      <div class="sport-home-hint">点击名字进入自己的打卡计划</div>
+
+      <!-- 三宫格统计 -->
+      <div class="hk-stats">
+        <div class="hk-stat-card">
+          <div class="stat-num" id="homeStatTotal">0</div>
+          <div class="stat-label">查看任务</div>
+        </div>
+        <div class="hk-stat-card">
+          <div class="stat-num" id="homeStatDone">0</div>
+          <div class="stat-label">已完成</div>
+        </div>
+        <div class="hk-stat-card">
+          <div class="stat-num" id="homeStatHistory">0</div>
+          <div class="stat-label">历史任务</div>
+        </div>
+      </div>
+
+      <!-- 共同打卡项 -->
+      <div class="checkin-list" id="homeCheckinList"></div>
+      <button class="add-checkin-btn" id="btnAddHomeCheckin" style="margin-bottom:14px">+ 添加共同打卡</button>
 
       <!-- 合并周打卡条 -->
       <div class="sp-week neutral" style="width:100%">
@@ -611,8 +631,8 @@
         <input type="text" id="sportTitle" placeholder="如：跑步30分钟" maxlength="20">
       </div>
       <div class="form-row">
-        <label>选择 emoji</label>
-        <div class="emoji-row" id="sportEmojiRow"></div>
+        <label>emoji（输入一个表情）</label>
+        <input type="text" id="sportEmoji" placeholder="如：🏃" maxlength="2" style="width:80px;text-align:center;font-size:20px">
       </div>
       <div class="form-row">
         <label>一周几次</label>
@@ -788,8 +808,8 @@ let state = {
   customCats: ['吃饭','便利店','超市','家用','娱乐'],
   anniversaries: [],
   plans: [],
-  checkins: {A:[], B:[]},
-  checkinLogs: {A:{}, B:{}},
+  checkins: {A:[], B:[], shared:[]},
+  checkinLogs: {A:{}, B:{}, shared:{}},
 };
 
 let pollTimer = null;
@@ -1533,13 +1553,11 @@ document.getElementById('calNext').onclick = ()=>{
 };
 
 /* ===== 运动打卡模块（双人） ===== */
-const SPORT_EMOJIS = ['🏃','💪','🧘','🚴','🏊','⚽','🏀','🤸','跳绳','散步'];
 let sportView = null;          // null=home, 'A'=帆帆, 'B'=源源
 let sportPerson = null;        // 当前操作的人
 let homeWeekOffset = 0;        // 首页周打卡偏移
 let personWeekOffset = 0;      // 个人页周打卡偏移
 let editingCheckinId = null;
-let sportSelectedEmoji = '🏃';
 let sportSelectedFreq = 3;
 
 /* 获取某周（offset 周）的周一到周日的日期数组 */
@@ -1571,7 +1589,7 @@ function isPersonDayChecked(p, dateStr){
 
 /* 合并：任一人完成即算 checked */
 function isCombinedDayChecked(dateStr){
-  return isPersonDayChecked('A', dateStr) || isPersonDayChecked('B', dateStr);
+  return isPersonDayChecked('A', dateStr) || isPersonDayChecked('B', dateStr) || isPersonDayChecked('shared', dateStr);
 }
 
 /* 渲染头像（首页用） */
@@ -1610,7 +1628,69 @@ function renderSportHome(){
   document.getElementById('sportPerson').classList.remove('show');
   renderSportAvatar('A');
   renderSportAvatar('B');
+  renderHomeStats();
+  renderHomeCheckins();
   renderHomeWeekStrip();
+}
+
+/* 首页统计 */
+function renderHomeStats(){
+  const shared = state.checkins.shared || [];
+  const today = todayStr();
+  const done = (state.checkinLogs.shared||{})[today] || [];
+  document.getElementById('homeStatTotal').textContent = shared.length;
+  document.getElementById('homeStatDone').textContent = done.length;
+  const histDays = Object.keys(state.checkinLogs.shared||{}).filter(d=>(state.checkinLogs.shared[d]||[]).length>0).length;
+  document.getElementById('homeStatHistory').textContent = histDays;
+}
+
+/* 首页共同打卡列表 */
+function renderHomeCheckins(){
+  const list = document.getElementById('homeCheckinList');
+  const shared = state.checkins.shared || [];
+  if(shared.length===0){ list.innerHTML = ''; return; }
+  const today = todayStr();
+  const done = (state.checkinLogs.shared||{})[today] || [];
+  let html = '';
+  shared.forEach(c=>{
+    const checked = done.includes(c.id);
+    html += `<div class="checkin-item${checked?' done':''}">
+      <div class="checkin-cb${checked?' checked':''}" data-cid="${c.id}" data-person="shared">${checked?'✓':''}</div>
+      <span class="checkin-emoji">${c.emoji||'✅'}</span>
+      <div class="checkin-info">
+        <div class="checkin-title">${esc(c.title)}</div>
+        <div class="checkin-freq">每周${c.freq||1}次</div>
+      </div>
+      <div class="checkin-actions">
+        <button data-edit="${c.id}" data-person="shared" title="编辑">✏️</button>
+        <button data-del="${c.id}" data-person="shared" title="删除">🗑</button>
+      </div>
+    </div>`;
+  });
+  list.innerHTML = html;
+  // 勾选
+  list.querySelectorAll('.checkin-cb').forEach(cb=>{
+    cb.onclick = async ()=>{
+      const cid = cb.dataset.cid;
+      if(!state.checkinLogs.shared) state.checkinLogs.shared = {};
+      let logs = state.checkinLogs.shared[today] || [];
+      if(logs.includes(cid)) logs = logs.filter(id=>id!==cid);
+      else logs = [...logs, cid];
+      if(logs.length===0) delete state.checkinLogs.shared[today];
+      else state.checkinLogs.shared[today] = logs;
+      await saveConfig();
+      renderHomeCheckins();
+      renderHomeStats();
+    };
+  });
+  // 编辑
+  list.querySelectorAll('[data-edit]').forEach(btn=>{
+    btn.onclick = (ev)=>{ ev.stopPropagation(); openSportModal('shared', btn.dataset.edit); };
+  });
+  // 删除
+  list.querySelectorAll('[data-del]').forEach(btn=>{
+    btn.onclick = (ev)=>{ ev.stopPropagation(); deleteCheckin('shared', btn.dataset.del); };
+  });
 }
 
 /* 渲染首页合并周条 */
@@ -1776,35 +1856,21 @@ function openSportModal(p, editId){
     const item = (state.checkins[p]||[]).find(c=>c.id===editId);
     titleEl.textContent = '编辑打卡项';
     document.getElementById('sportTitle').value = item.title;
-    sportSelectedEmoji = item.emoji || '🏃';
+    document.getElementById('sportEmoji').value = item.emoji || '🏃';
     sportSelectedFreq = item.freq || 3;
   } else {
     titleEl.textContent = '添加打卡项';
     document.getElementById('sportTitle').value = '';
-    sportSelectedEmoji = '🏃';
+    document.getElementById('sportEmoji').value = '🏃';
     sportSelectedFreq = 3;
   }
-  // 保存按钮颜色跟随当前人
-  const color = p==='A' ? 'var(--sp-pink)' : 'var(--sp-blue)';
+  // 保存按钮颜色
+  const color = p==='A' ? 'var(--sp-pink)' : (p==='B' ? 'var(--sp-blue)' : 'var(--hk-pink)');
   saveBtn.style.background = color;
   saveBtn.style.borderColor = color;
-  renderEmojiPicker();
   renderFreqPicker();
   document.getElementById('sportModalMask').classList.add('show');
   document.getElementById('sportTitle').focus();
-}
-
-function renderEmojiPicker(){
-  const row = document.getElementById('sportEmojiRow');
-  row.innerHTML = SPORT_EMOJIS.map(e=>
-    `<div class="emoji-pick${e===sportSelectedEmoji?' active':''}" data-emoji="${esc(e)}">${e}</div>`
-  ).join('');
-  row.querySelectorAll('.emoji-pick').forEach(el=>{
-    el.onclick = ()=>{
-      sportSelectedEmoji = el.dataset.emoji;
-      renderEmojiPicker();
-    };
-  });
 }
 
 function renderFreqPicker(){
@@ -1838,24 +1904,27 @@ document.getElementById('sportModalCancel').onclick = ()=>{
 
 document.getElementById('sportModalSave').onclick = async ()=>{
   const title = document.getElementById('sportTitle').value.trim();
+  const emoji = document.getElementById('sportEmoji').value.trim() || '🏃';
   if(!title){ toast('请输入项目名称'); return; }
   const p = sportPerson;
   if(!p){ toast('出错了'); return; }
+  if(!state.checkins[p]) state.checkins[p] = [];
   if(editingCheckinId){
-    const item = (state.checkins[p]||[]).find(c=>c.id===editingCheckinId);
+    const item = state.checkins[p].find(c=>c.id===editingCheckinId);
     if(item){
       item.title = title;
-      item.emoji = sportSelectedEmoji;
+      item.emoji = emoji;
       item.freq = sportSelectedFreq;
     }
   } else {
     state.checkins[p].push({
-      id: uid(), title, emoji: sportSelectedEmoji, freq: sportSelectedFreq
+      id: uid(), title, emoji, freq: sportSelectedFreq
     });
   }
   await saveConfig();
   document.getElementById('sportModalMask').classList.remove('show');
-  renderCheckinList(p);
+  if(p==='shared') renderSportHome();
+  else renderCheckinList(p);
   toast('已保存');
 };
 
@@ -1867,6 +1936,22 @@ document.getElementById('homeWkPrev').onclick = ()=>{ homeWeekOffset--; renderHo
 document.getElementById('homeWkNext').onclick = ()=>{ homeWeekOffset++; renderHomeWeekStrip(); };
 document.getElementById('personWkPrev').onclick = ()=>{ personWeekOffset--; renderPersonWeekStrip(sportView); };
 document.getElementById('personWkNext').onclick = ()=>{ personWeekOffset++; renderPersonWeekStrip(sportView); };
+
+// 主页添加共同打卡
+document.getElementById('btnAddHomeCheckin').onclick = ()=>{
+  sportPerson = 'shared'; // 共同打卡标记
+  editingCheckinId = null;
+  document.getElementById('sportModalTitle').textContent = '添加共同打卡';
+  document.getElementById('sportTitle').value = '';
+  document.getElementById('sportEmoji').value = '🏃';
+  sportSelectedFreq = 3;
+  const saveBtn = document.getElementById('sportModalSave');
+  saveBtn.style.background = 'var(--hk-pink)';
+  saveBtn.style.borderColor = 'var(--hk-pink)';
+  renderFreqPicker();
+  document.getElementById('sportModalMask').classList.add('show');
+  document.getElementById('sportTitle').focus();
+};
 
 function deleteCheckin(p, id){
   confirmModal('删除', '确定删除这个打卡项？', async ()=>{
