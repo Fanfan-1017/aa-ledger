@@ -459,6 +459,10 @@
   .checkin-cb.B.checked{background:var(--sp-blue);border-color:var(--sp-blue)}
   .checkin-cb.neutral{border-color:var(--text3)}
   .checkin-cb.neutral.checked{background:var(--green);border-color:var(--green)}
+  .checkin-cb.cancheck{border-style:dashed;opacity:0.7}
+  .checkin-cb.cancheck:active{opacity:1}
+  .checkin-freq.progress{font-weight:600}
+  .checkin-item .checkin-freq .full{color:var(--green);font-weight:600}
   .checkin-emoji{font-size:18px;flex-shrink:0}
   .checkin-info{flex:1;min-width:0}
   .checkin-title{font-size:14px;color:var(--text);font-weight:500}
@@ -1768,21 +1772,17 @@ function renderPageStats(page, dataKey){
   const histEl = document.getElementById(prefix+'StatHistory');
   if(!totalEl) return;
   const tasks = state.checkins[dataKey] || [];
-  // 「已完成」统计本周（周一到今天）打卡总次数
-  const weekDates = getWeekDates(0);
-  const today = todayStr();
-  let weekDoneCount = 0;
   const logs = state.checkinLogs[dataKey] || {};
-  weekDates.forEach(d=>{
-    const ds = dateToStr(d);
-    if(ds <= today){
-      weekDoneCount += (logs[ds] || []).length;
-    }
+  // 「已完成」= 本周打满次数的项目数
+  let doneCount = 0;
+  tasks.forEach(t=>{
+    const freq = t.freq || 1;
+    if(getWeekCheckinCount(dataKey, t.id) >= freq) doneCount++;
   });
   // 「历史任务」统计有打卡记录的总天数
   const histDays = Object.keys(logs).filter(d=>(logs[d]||[]).length>0).length;
   totalEl.textContent = tasks.length;
-  doneEl.textContent = weekDoneCount;
+  doneEl.textContent = doneCount;
   histEl.textContent = histDays;
 }
 
@@ -1811,29 +1811,29 @@ function renderPageWeek(page, dataKey, offset){
     </div>`;
   });
   grid.innerHTML = html;
-  // 点击日期：切换当天全部打卡状态（仅个人页有效）
-  if(page !== 'home'){
-    grid.querySelectorAll('.sp-day').forEach(el=>{
-      el.onclick = async ()=>{
-        const ds = el.dataset.date;
-        const tasks = state.checkins[dataKey] || [];
-        if(tasks.length===0){ toast('请先添加打卡项'); return; }
-        let logs = (state.checkinLogs[dataKey]||{})[ds] || [];
-        if(logs.length >= tasks.length){
-          logs = [];
-        } else {
-          logs = tasks.map(c=>c.id);
-        }
-        if(!state.checkinLogs[dataKey]) state.checkinLogs[dataKey] = {};
-        if(logs.length===0) delete state.checkinLogs[dataKey][ds];
-        else state.checkinLogs[dataKey][ds] = logs;
-        // 乐观更新：立即重绘
-        renderPageWeek(page, dataKey, offset);
-        renderPageStats(page, dataKey);
-        await saveConfig();
-      };
-    });
-  }
+  // 周打卡条仅查看，打卡通过任务列表勾选
+}
+
+/* 获取某项本周已打卡次数 */
+function getWeekCheckinCount(dataKey, cid){
+  const weekDates = getWeekDates(0);
+  const today = todayStr();
+  const logs = state.checkinLogs[dataKey] || {};
+  let count = 0;
+  weekDates.forEach(d=>{
+    const ds = dateToStr(d);
+    if(ds <= today && logs[ds] && logs[ds].includes(cid)){
+      count++;
+    }
+  });
+  return count;
+}
+
+/* 获取某项今天是否已打卡 */
+function isTodayChecked(dataKey, cid){
+  const today = todayStr();
+  const logs = state.checkinLogs[dataKey] || {};
+  return (logs[today] || []).includes(cid);
 }
 
 /* 渲染任务列表 */
@@ -1849,19 +1849,20 @@ function renderPageList(page, dataKey){
     return;
   }
   if(empty) empty.style.display = 'none';
-  const today = todayStr();
-  const done = (state.checkinLogs[dataKey]||{})[today] || [];
   const themeClass = page === 'home' ? ' neutral' : ' '+page;
   let html = '';
   tasks.forEach(c=>{
-    const checked = done.includes(c.id);
     const freq = c.freq || 1;
-    html += `<div class="checkin-item${themeClass}${checked?' done':''}">
-      <div class="checkin-cb${themeClass}${checked?' checked':''}" data-cid="${c.id}">${checked?'✓':''}</div>
+    const weekCount = getWeekCheckinCount(dataKey, c.id);
+    const isDone = weekCount >= freq;          // 本周已打满
+    const todayChecked = isTodayChecked(dataKey, c.id); // 今天是否已打
+    const canCheck = !todayChecked && !isDone;  // 能否再打一次
+    html += `<div class="checkin-item${themeClass}${isDone?' done':''}">
+      <div class="checkin-cb${themeClass}${isDone?' checked':''}${canCheck?' cancheck':''}" data-cid="${c.id}">${isDone?'✓':''}</div>
       <span class="checkin-emoji">${c.emoji||'✅'}</span>
       <div class="checkin-info">
         <div class="checkin-title">${esc(c.title)}</div>
-        <div class="checkin-freq">每周${freq}次</div>
+        <div class="checkin-freq">${isDone?'<span class="full">已完成 '+freq+'/'+freq+'</span>':weekCount+'/'+freq+' 次'+(todayChecked?' · 今日已打':' · 点击打卡')}</div>
       </div>
       <div class="checkin-actions">
         <button data-edit="${c.id}" title="编辑">✏️</button>
@@ -1870,24 +1871,33 @@ function renderPageList(page, dataKey){
     </div>`;
   });
   list.innerHTML = html;
-  // 勾选事件（今日）
+  // 勾选事件：每次点击增加一次今日打卡（今天已打或已满则不可点）
   list.querySelectorAll('.checkin-cb').forEach(cb=>{
     cb.onclick = async ()=>{
       const cid = cb.dataset.cid;
+      const task = tasks.find(t=>t.id===cid);
+      if(!task) return;
+      const freq = task.freq || 1;
+      const weekCount = getWeekCheckinCount(dataKey, cid);
+      const todayChecked = isTodayChecked(dataKey, cid);
+      if(weekCount >= freq){
+        toast('本周已完成 '+freq+' 次');
+        return;
+      }
+      if(todayChecked){
+        toast('今天已打过卡，明天再来');
+        return;
+      }
+      // 增加今日打卡
       const today = todayStr();
       if(!state.checkinLogs[dataKey]) state.checkinLogs[dataKey] = {};
       let logs = state.checkinLogs[dataKey][today] || [];
-      if(logs.includes(cid)){
-        logs = logs.filter(id=>id!==cid);
-      } else {
-        logs = [...logs, cid];
-      }
-      if(logs.length===0) delete state.checkinLogs[dataKey][today];
-      else state.checkinLogs[dataKey][today] = logs;
+      logs = [...logs, cid];
+      state.checkinLogs[dataKey][today] = logs;
       // 乐观更新：立即重绘 UI
       renderPageList(page, dataKey);
       renderPageStats(page, dataKey);
-      if(page === 'home') renderPageWeek('home', 'shared', homeWeekOffset);
+      renderPageWeek(page, dataKey, page==='home'?homeWeekOffset:(page==='A'?aWeekOffset:bWeekOffset));
       // 再异步保存到服务器
       await saveConfig();
     };
