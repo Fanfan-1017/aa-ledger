@@ -319,7 +319,37 @@
   }
   .tab-btn.sport.active{color:var(--sp-pink)}
 
-  /* 首页：双人头像 */
+  /* 运动子标签 */
+  .sport-tabs{display:flex;gap:0;margin-bottom:14px;background:var(--bg);border-radius:var(--radius);padding:3px;border:1px solid var(--border)}
+  .sport-tab{
+    flex:1;padding:10px 8px;border:none;border-radius:8px;background:transparent;
+    cursor:pointer;font-size:14px;font-weight:500;color:var(--text2);
+    text-align:center;transition:all 0.15s;font-family:var(--font);
+    -webkit-tap-highlight-color:transparent;
+  }
+  .sport-tab.active{background:var(--card);color:var(--text);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,0.08)}
+  .sport-tab.A.active{color:var(--sp-pink)}
+  .sport-tab.B.active{color:var(--sp-blue)}
+
+  .sport-page{display:none}
+  .sport-page.active{display:block}
+
+  /* 三宫格统计 */
+  .hk-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+  .hk-stat-card{
+    background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+    padding:14px 8px;text-align:center;transition:all 0.15s;
+  }
+  .hk-stat-card .stat-num{font-size:24px;font-weight:700;color:var(--text);line-height:1.2}
+  .hk-stat-card .stat-label{font-size:12px;color:var(--text2);margin-top:4px}
+  .sp-page-A .hk-stat-card{background:var(--sp-pink-card);border-color:var(--sp-pink-border)}
+  .sp-page-A .hk-stat-card .stat-num{color:var(--sp-pink-text)}
+  .sp-page-A .hk-stat-card .stat-label{color:var(--sp-pink-text)}
+  .sp-page-B .hk-stat-card{background:var(--sp-blue-card);border-color:var(--sp-blue-border)}
+  .sp-page-B .hk-stat-card .stat-num{color:var(--sp-blue-text)}
+  .sp-page-B .hk-stat-card .stat-label{color:var(--sp-blue-text)}
+
+  /* 运动主页（两头像 + 内容） */
   .sport-home{display:flex;flex-direction:column;align-items:center;padding:8px 0 4px}
   .sport-home-avatars{display:flex;gap:40px;justify-content:center;margin-bottom:16px}
   .sport-avatar-btn{
@@ -545,25 +575,20 @@
   <!-- ==================== 运动打卡面板 ==================== -->
   <div class="tab-panel" id="panelSport">
 
-    <!-- 首页：双人头像 -->
-    <div class="sport-home" id="sportHome">
-      <div class="sport-home-avatars">
-        <button class="sport-avatar-btn" id="sportAvatarB">
-          <div class="sport-avatar-ring B" id="sportRingB">
-            <span class="default-icon">👤</span>
-          </div>
-          <span class="sport-avatar-name B" id="sportNameB">源源</span>
-        </button>
-        <button class="sport-avatar-btn" id="sportAvatarA">
-          <div class="sport-avatar-ring A" id="sportRingA">
-            <span class="default-icon">👤</span>
-          </div>
-          <span class="sport-avatar-name A" id="sportNameA">帆帆</span>
-        </button>
+    <!-- 共同页面（首页：两个头像 + 统计 + 周条 + 列表 + 添加） -->
+    <div class="sport-page active" id="spPageHome">
+      <div class="sport-home">
+        <div class="sport-home-avatars">
+          <button class="sport-avatar-btn" id="sportAvatarB">
+            <div class="sport-avatar-ring B" id="sportRingB"></div>
+            <span class="sport-avatar-name B" id="sportNameB">源源</span>
+          </button>
+          <button class="sport-avatar-btn" id="sportAvatarA">
+            <div class="sport-avatar-ring A" id="sportRingA"></div>
+            <span class="sport-avatar-name A" id="sportNameA">帆帆</span>
+          </button>
+        </div>
       </div>
-      <div class="sport-home-hint">点击名字进入自己的打卡计划</div>
-
-      <!-- 三宫格统计 -->
       <div class="hk-stats">
         <div class="hk-stat-card">
           <div class="stat-num" id="homeStatTotal">0</div>
@@ -578,13 +603,7 @@
           <div class="stat-label">历史任务</div>
         </div>
       </div>
-
-      <!-- 共同打卡项 -->
-      <div class="checkin-list" id="homeCheckinList"></div>
-      <button class="add-checkin-btn" id="btnAddHomeCheckin" style="margin-bottom:14px">+ 添加共同打卡</button>
-
-      <!-- 合并周打卡条 -->
-      <div class="sp-week neutral" style="width:100%">
+      <div class="sp-week neutral">
         <div class="sp-week-head">
           <span class="wk-title" id="homeWkTitle">本周打卡</span>
           <div class="wk-arrows">
@@ -594,30 +613,79 @@
         </div>
         <div class="sp-week-grid" id="homeWeekGrid"></div>
       </div>
+      <div class="checkin-list" id="homeCheckinList"></div>
+      <div class="empty" id="homeCheckinEmpty">还没有打卡项，点击下方添加</div>
+      <button class="add-checkin-btn" id="btnAddHomeCheckin">+ 添加打卡项</button>
     </div>
 
-    <!-- 个人视图 -->
-    <div class="sport-person" id="sportPerson">
+    <!-- 帆帆个人页面（返回按钮 + 统计 + 周条 + 列表 + 添加） -->
+    <div class="sport-page sp-page-A" id="spPageA">
       <div class="sport-person-head">
-        <button class="sport-back-btn" id="sportBack">‹</button>
-        <span class="sport-person-title" id="sportPersonTitle"></span>
+        <button class="sport-back-btn" id="sportBackA">‹</button>
+        <span class="sport-person-title A" id="sportTitleA">帆帆</span>
       </div>
-
-      <div class="sp-week" id="personWeek">
+      <div class="hk-stats">
+        <div class="hk-stat-card">
+          <div class="stat-num" id="aStatTotal">0</div>
+          <div class="stat-label">查看任务</div>
+        </div>
+        <div class="hk-stat-card">
+          <div class="stat-num" id="aStatDone">0</div>
+          <div class="stat-label">已完成</div>
+        </div>
+        <div class="hk-stat-card">
+          <div class="stat-num" id="aStatHistory">0</div>
+          <div class="stat-label">历史任务</div>
+        </div>
+      </div>
+      <div class="sp-week A">
         <div class="sp-week-head">
-          <span class="wk-title" id="personWkTitle">本周打卡</span>
+          <span class="wk-title" id="aWkTitle">本周打卡</span>
           <div class="wk-arrows">
-            <button class="wk-arrow" id="personWkPrev">‹</button>
-            <button class="wk-arrow" id="personWkNext">›</button>
+            <button class="wk-arrow" id="aWkPrev">‹</button>
+            <button class="wk-arrow" id="aWkNext">›</button>
           </div>
         </div>
-        <div class="sp-week-grid" id="personWeekGrid"></div>
+        <div class="sp-week-grid" id="aWeekGrid"></div>
       </div>
+      <div class="checkin-list" id="aCheckinList"></div>
+      <div class="empty" id="aCheckinEmpty">还没有打卡项，点击下方添加</div>
+      <button class="add-checkin-btn A" id="btnAddACheckin">+ 添加打卡项</button>
+    </div>
 
-      <div class="checkin-list" id="checkinList"></div>
-      <div class="empty" id="checkinEmpty">还没有打卡项，点击下方添加</div>
-
-      <button class="add-checkin-btn" id="btnAddCheckin">+ 添加打卡项</button>
+    <!-- 源源个人页面（返回按钮 + 统计 + 周条 + 列表 + 添加） -->
+    <div class="sport-page sp-page-B" id="spPageB">
+      <div class="sport-person-head">
+        <button class="sport-back-btn" id="sportBackB">‹</button>
+        <span class="sport-person-title B" id="sportTitleB">源源</span>
+      </div>
+      <div class="hk-stats">
+        <div class="hk-stat-card">
+          <div class="stat-num" id="bStatTotal">0</div>
+          <div class="stat-label">查看任务</div>
+        </div>
+        <div class="hk-stat-card">
+          <div class="stat-num" id="bStatDone">0</div>
+          <div class="stat-label">已完成</div>
+        </div>
+        <div class="hk-stat-card">
+          <div class="stat-num" id="bStatHistory">0</div>
+          <div class="stat-label">历史任务</div>
+        </div>
+      </div>
+      <div class="sp-week B">
+        <div class="sp-week-head">
+          <span class="wk-title" id="bWkTitle">本周打卡</span>
+          <div class="wk-arrows">
+            <button class="wk-arrow" id="bWkPrev">‹</button>
+            <button class="wk-arrow" id="bWkNext">›</button>
+          </div>
+        </div>
+        <div class="sp-week-grid" id="bWeekGrid"></div>
+      </div>
+      <div class="checkin-list" id="bCheckinList"></div>
+      <div class="empty" id="bCheckinEmpty">还没有打卡项，点击下方添加</div>
+      <button class="add-checkin-btn B" id="btnAddBCheckin">+ 添加打卡项</button>
     </div>
 
   </div>
@@ -1554,9 +1622,10 @@ document.getElementById('calNext').onclick = ()=>{
 
 /* ===== 运动打卡模块（双人） ===== */
 let sportView = null;          // null=home, 'A'=帆帆, 'B'=源源
-let sportPerson = null;        // 当前操作的人
-let homeWeekOffset = 0;        // 首页周打卡偏移
-let personWeekOffset = 0;      // 个人页周打卡偏移
+let sportPerson = null;        // 当前操作的人（弹窗用）
+let homeWeekOffset = 0;
+let aWeekOffset = 0;
+let bWeekOffset = 0;
 let editingCheckinId = null;
 let sportSelectedFreq = 3;
 
@@ -1592,6 +1661,18 @@ function isCombinedDayChecked(dateStr){
   return isPersonDayChecked('A', dateStr) || isPersonDayChecked('B', dateStr) || isPersonDayChecked('shared', dateStr);
 }
 
+/* 确保数据结构完整 */
+function ensureSportData(){
+  if(!state.checkins) state.checkins = {A:[], B:[], shared:[]};
+  if(!state.checkins.A) state.checkins.A = [];
+  if(!state.checkins.B) state.checkins.B = [];
+  if(!state.checkins.shared) state.checkins.shared = [];
+  if(!state.checkinLogs) state.checkinLogs = {A:{}, B:{}, shared:{}};
+  if(!state.checkinLogs.A) state.checkinLogs.A = {};
+  if(!state.checkinLogs.B) state.checkinLogs.B = {};
+  if(!state.checkinLogs.shared) state.checkinLogs.shared = {};
+}
+
 /* 渲染头像（首页用） */
 function renderSportAvatar(p){
   const ring = document.getElementById('sportRing'+p);
@@ -1608,252 +1689,178 @@ function renderSportAvatar(p){
 
 /* 主渲染入口 */
 function renderSport(){
-  // 确保数据结构
-  if(!state.checkins.A) state.checkins = {A:[], B:[]};
-  if(!state.checkins.B) state.checkins = {A: state.checkins.A||[], B: state.checkins.B||[]};
-  if(!state.checkinLogs.A) state.checkinLogs = {A:{}, B:{}};
-  if(!state.checkinLogs.B) state.checkinLogs = {A: state.checkinLogs.A||{}, B: state.checkinLogs.B||{}};
-
-  if(sportView){
-    renderSportPerson(sportView);
+  ensureSportData();
+  if(sportView === 'A'){
+    showSportPage('A');
+  } else if(sportView === 'B'){
+    showSportPage('B');
   } else {
-    renderSportHome();
+    showSportPage('home');
   }
 }
 
-/* 首页 */
-function renderSportHome(){
-  sportView = null;
-  document.getElementById('sportHome').style.display = 'flex';
-  document.getElementById('sportPerson').classList.remove('show');
-  renderSportAvatar('A');
-  renderSportAvatar('B');
-  renderHomeStats();
-  renderHomeCheckins();
-  renderHomeWeekStrip();
+/* 切换页面显示 */
+function showSportPage(page){
+  const pages = {home:'spPageHome', A:'spPageA', B:'spPageB'};
+  Object.values(pages).forEach(id=>{
+    const el = document.getElementById(id);
+    if(el) el.classList.remove('active');
+  });
+  const target = document.getElementById(pages[page]);
+  if(target) target.classList.add('active');
+
+  if(page === 'home'){
+    renderSportAvatar('A');
+    renderSportAvatar('B');
+    renderPageStats('home', 'shared');
+    renderPageWeek('home', 'shared', homeWeekOffset);
+    renderPageList('home', 'shared');
+  } else {
+    // 动态更新个人页标题
+    const titleEl = document.getElementById('sportTitle'+page);
+    if(titleEl) titleEl.textContent = nameOf(page);
+    renderPageStats(page, page);
+    renderPageWeek(page, page, page==='A'?aWeekOffset:bWeekOffset);
+    renderPageList(page, page);
+  }
 }
 
-/* 首页统计 */
-function renderHomeStats(){
-  const shared = state.checkins.shared || [];
+/* 渲染统计（三宫格） */
+function renderPageStats(page, dataKey){
+  const prefix = page === 'home' ? 'home' : page.toLowerCase();
+  const totalEl = document.getElementById(prefix+'StatTotal');
+  const doneEl = document.getElementById(prefix+'StatDone');
+  const histEl = document.getElementById(prefix+'StatHistory');
+  if(!totalEl) return;
+  const tasks = state.checkins[dataKey] || [];
   const today = todayStr();
-  const done = (state.checkinLogs.shared||{})[today] || [];
-  document.getElementById('homeStatTotal').textContent = shared.length;
-  document.getElementById('homeStatDone').textContent = done.length;
-  const histDays = Object.keys(state.checkinLogs.shared||{}).filter(d=>(state.checkinLogs.shared[d]||[]).length>0).length;
-  document.getElementById('homeStatHistory').textContent = histDays;
+  const done = (state.checkinLogs[dataKey]||{})[today] || [];
+  const histDays = Object.keys(state.checkinLogs[dataKey]||{}).filter(d=>(state.checkinLogs[dataKey][d]||[]).length>0).length;
+  totalEl.textContent = tasks.length;
+  doneEl.textContent = done.length;
+  histEl.textContent = histDays;
 }
 
-/* 首页共同打卡列表 */
-function renderHomeCheckins(){
-  const list = document.getElementById('homeCheckinList');
-  const shared = state.checkins.shared || [];
-  if(shared.length===0){ list.innerHTML = ''; return; }
+/* 渲染周打卡条 */
+function renderPageWeek(page, dataKey, offset){
+  const prefix = page === 'home' ? 'home' : page.toLowerCase();
+  const grid = document.getElementById(prefix+'WeekGrid');
+  const title = document.getElementById(prefix+'WkTitle');
+  if(!grid) return;
+  const dates = getWeekDates(offset);
   const today = todayStr();
-  const done = (state.checkinLogs.shared||{})[today] || [];
+  const dows = ['周一','周二','周三','周四','周五','周六','周日'];
+  const start = dates[0], end = dates[6];
+  title.textContent = `${start.getMonth()+1}/${start.getDate()} - ${end.getMonth()+1}/${end.getDate()}`;
   let html = '';
-  shared.forEach(c=>{
+  dates.forEach((d, i)=>{
+    const ds = dateToStr(d);
+    const isToday = ds === today;
+    const checked = page === 'home' ? isCombinedDayChecked(ds) : isPersonDayChecked(dataKey, ds);
+    const classes = ['sp-day'];
+    if(isToday) classes.push('today');
+    html += `<div class="${classes.join(' ')}" data-date="${ds}">
+      <span class="sp-date">${d.getMonth()+1}/${d.getDate()}</span>
+      <span class="sp-dow">${dows[i]}</span>
+      <div class="sp-day-circle${checked?' checked':''}">${checked?'✓':''}</div>
+    </div>`;
+  });
+  grid.innerHTML = html;
+  // 点击日期：切换当天全部打卡状态（仅个人页有效）
+  if(page !== 'home'){
+    grid.querySelectorAll('.sp-day').forEach(el=>{
+      el.onclick = async ()=>{
+        const ds = el.dataset.date;
+        const tasks = state.checkins[dataKey] || [];
+        if(tasks.length===0){ toast('请先添加打卡项'); return; }
+        let logs = (state.checkinLogs[dataKey]||{})[ds] || [];
+        if(logs.length >= tasks.length){
+          logs = [];
+        } else {
+          logs = tasks.map(c=>c.id);
+        }
+        if(!state.checkinLogs[dataKey]) state.checkinLogs[dataKey] = {};
+        if(logs.length===0) delete state.checkinLogs[dataKey][ds];
+        else state.checkinLogs[dataKey][ds] = logs;
+        await saveConfig();
+        renderPageWeek(page, dataKey, offset);
+      };
+    });
+  }
+}
+
+/* 渲染任务列表 */
+function renderPageList(page, dataKey){
+  const prefix = page === 'home' ? 'home' : page.toLowerCase();
+  const list = document.getElementById(prefix+'CheckinList');
+  const empty = document.getElementById(prefix+'CheckinEmpty');
+  if(!list) return;
+  const tasks = state.checkins[dataKey] || [];
+  if(tasks.length===0){
+    list.innerHTML = '';
+    if(empty) empty.style.display = 'block';
+    return;
+  }
+  if(empty) empty.style.display = 'none';
+  const today = todayStr();
+  const done = (state.checkinLogs[dataKey]||{})[today] || [];
+  const themeClass = page === 'home' ? '' : ' '+page;
+  let html = '';
+  tasks.forEach(c=>{
     const checked = done.includes(c.id);
-    html += `<div class="checkin-item${checked?' done':''}">
-      <div class="checkin-cb${checked?' checked':''}" data-cid="${c.id}" data-person="shared">${checked?'✓':''}</div>
+    const freq = c.freq || 1;
+    html += `<div class="checkin-item${themeClass}${checked?' done':''}">
+      <div class="checkin-cb${themeClass}${checked?' checked':''}" data-cid="${c.id}">${checked?'✓':''}</div>
       <span class="checkin-emoji">${c.emoji||'✅'}</span>
       <div class="checkin-info">
         <div class="checkin-title">${esc(c.title)}</div>
-        <div class="checkin-freq">每周${c.freq||1}次</div>
+        <div class="checkin-freq">每周${freq}次</div>
       </div>
       <div class="checkin-actions">
-        <button data-edit="${c.id}" data-person="shared" title="编辑">✏️</button>
-        <button data-del="${c.id}" data-person="shared" title="删除">🗑</button>
+        <button data-edit="${c.id}" title="编辑">✏️</button>
+        <button data-del="${c.id}" title="删除">🗑</button>
       </div>
     </div>`;
   });
   list.innerHTML = html;
-  // 勾选
+  // 勾选事件（今日）
   list.querySelectorAll('.checkin-cb').forEach(cb=>{
     cb.onclick = async ()=>{
       const cid = cb.dataset.cid;
-      if(!state.checkinLogs.shared) state.checkinLogs.shared = {};
-      let logs = state.checkinLogs.shared[today] || [];
-      if(logs.includes(cid)) logs = logs.filter(id=>id!==cid);
-      else logs = [...logs, cid];
-      if(logs.length===0) delete state.checkinLogs.shared[today];
-      else state.checkinLogs.shared[today] = logs;
+      const today = todayStr();
+      if(!state.checkinLogs[dataKey]) state.checkinLogs[dataKey] = {};
+      let logs = state.checkinLogs[dataKey][today] || [];
+      if(logs.includes(cid)){
+        logs = logs.filter(id=>id!==cid);
+      } else {
+        logs = [...logs, cid];
+      }
+      if(logs.length===0) delete state.checkinLogs[dataKey][today];
+      else state.checkinLogs[dataKey][today] = logs;
       await saveConfig();
-      renderHomeCheckins();
-      renderHomeStats();
+      renderPageList(page, dataKey);
+      renderPageStats(page, dataKey);
+      if(page === 'home') renderPageWeek('home', 'shared', homeWeekOffset);
     };
   });
   // 编辑
   list.querySelectorAll('[data-edit]').forEach(btn=>{
-    btn.onclick = (ev)=>{ ev.stopPropagation(); openSportModal('shared', btn.dataset.edit); };
+    btn.onclick = (ev)=>{ ev.stopPropagation(); openSportModal(dataKey, btn.dataset.edit, page); };
   });
   // 删除
   list.querySelectorAll('[data-del]').forEach(btn=>{
-    btn.onclick = (ev)=>{ ev.stopPropagation(); deleteCheckin('shared', btn.dataset.del); };
+    btn.onclick = (ev)=>{ ev.stopPropagation(); deleteCheckin(dataKey, btn.dataset.del, page); };
   });
-}
-
-/* 渲染首页合并周条 */
-function renderHomeWeekStrip(){
-  const grid = document.getElementById('homeWeekGrid');
-  const title = document.getElementById('homeWkTitle');
-  const dates = getWeekDates(homeWeekOffset);
-  const today = todayStr();
-  const dows = ['周一','周二','周三','周四','周五','周六','周日'];
-  const start = dates[0], end = dates[6];
-  title.textContent = `${start.getMonth()+1}/${start.getDate()} - ${end.getMonth()+1}/${end.getDate()}`;
-  let html = '';
-  dates.forEach((d, i)=>{
-    const ds = dateToStr(d);
-    const isToday = ds === today;
-    const checked = isCombinedDayChecked(ds);
-    const classes = ['sp-day'];
-    if(isToday) classes.push('today');
-    html += `<div class="${classes.join(' ')}" data-date="${ds}">
-      <span class="sp-date">${d.getMonth()+1}/${d.getDate()}</span>
-      <span class="sp-dow">${dows[i]}</span>
-      <div class="sp-day-circle${checked?' checked':''}">${checked?'✓':''}</div>
-    </div>`;
-  });
-  grid.innerHTML = html;
-}
-
-/* 个人视图 */
-function renderSportPerson(p){
-  sportView = p;
-  sportPerson = p;
-  document.getElementById('sportHome').style.display = 'none';
-  document.getElementById('sportPerson').classList.add('show');
-
-  // 标题
-  const titleEl = document.getElementById('sportPersonTitle');
-  titleEl.textContent = nameOf(p);
-  titleEl.className = 'sport-person-title ' + p;
-
-  // 周条样式
-  const weekEl = document.getElementById('personWeek');
-  weekEl.className = 'sp-week ' + p;
-
-  // 添加按钮样式
-  const addBtn = document.getElementById('btnAddCheckin');
-  addBtn.className = 'add-checkin-btn ' + p;
-
-  renderPersonWeekStrip(p);
-  renderCheckinList(p);
-}
-
-/* 渲染个人周条 */
-function renderPersonWeekStrip(p){
-  const grid = document.getElementById('personWeekGrid');
-  const title = document.getElementById('personWkTitle');
-  const dates = getWeekDates(personWeekOffset);
-  const today = todayStr();
-  const dows = ['周一','周二','周三','周四','周五','周六','周日'];
-  const start = dates[0], end = dates[6];
-  title.textContent = `${start.getMonth()+1}/${start.getDate()} - ${end.getMonth()+1}/${end.getDate()}`;
-  let html = '';
-  dates.forEach((d, i)=>{
-    const ds = dateToStr(d);
-    const isToday = ds === today;
-    const checked = isPersonDayChecked(p, ds);
-    const classes = ['sp-day'];
-    if(isToday) classes.push('today');
-    html += `<div class="${classes.join(' ')}" data-date="${ds}">
-      <span class="sp-date">${d.getMonth()+1}/${d.getDate()}</span>
-      <span class="sp-dow">${dows[i]}</span>
-      <div class="sp-day-circle${checked?' checked':''}">${checked?'✓':''}</div>
-    </div>`;
-  });
-  grid.innerHTML = html;
-  // 点击日期：切换当天全部打卡状态
-  grid.querySelectorAll('.sp-day').forEach(el=>{
-    el.onclick = async ()=>{
-      const ds = el.dataset.date;
-      const tasks = state.checkins[p] || [];
-      if(tasks.length===0){ toast('请先添加打卡项'); return; }
-      let logs = (state.checkinLogs[p]||{})[ds] || [];
-      if(logs.length >= tasks.length){
-        // 全部完成 -> 清空
-        logs = [];
-      } else {
-        logs = tasks.map(c=>c.id);
-      }
-      if(!state.checkinLogs[p]) state.checkinLogs[p] = {};
-      if(logs.length===0) delete state.checkinLogs[p][ds];
-      else state.checkinLogs[p][ds] = logs;
-      await saveConfig();
-      renderPersonWeekStrip(p);
-    };
-  });
-}
-
-/* 渲染个人任务列表 */
-function renderCheckinList(p){
-  const list = document.getElementById('checkinList');
-  const empty = document.getElementById('checkinEmpty');
-  const tasks = state.checkins[p] || [];
-  if(tasks.length===0){
-    list.innerHTML = '';
-    empty.style.display = 'block';
-  } else {
-    empty.style.display = 'none';
-    const today = todayStr();
-    const done = (state.checkinLogs[p]||{})[today] || [];
-    let html = '';
-    tasks.forEach(c=>{
-      const checked = done.includes(c.id);
-      const freq = c.freq || 1;
-      html += `<div class="checkin-item ${p}${checked?' done':''}">
-        <div class="checkin-cb ${p}${checked?' checked':''}" data-cid="${c.id}">${checked?'✓':''}</div>
-        <span class="checkin-emoji">${c.emoji||'✅'}</span>
-        <div class="checkin-info">
-          <div class="checkin-title">${esc(c.title)}</div>
-          <div class="checkin-freq">每周${freq}次</div>
-        </div>
-        <div class="checkin-actions">
-          <button data-edit="${c.id}" title="编辑">✏️</button>
-          <button data-del="${c.id}" title="删除">🗑</button>
-        </div>
-      </div>`;
-    });
-    list.innerHTML = html;
-    // 勾选事件（今日）
-    list.querySelectorAll('.checkin-cb').forEach(cb=>{
-      cb.onclick = async ()=>{
-        const cid = cb.dataset.cid;
-        const today = todayStr();
-        if(!state.checkinLogs[p]) state.checkinLogs[p] = {};
-        let logs = state.checkinLogs[p][today] || [];
-        if(logs.includes(cid)){
-          logs = logs.filter(id=>id!==cid);
-        } else {
-          logs = [...logs, cid];
-        }
-        if(logs.length===0) delete state.checkinLogs[p][today];
-        else state.checkinLogs[p][today] = logs;
-        await saveConfig();
-        renderCheckinList(p);
-      };
-    });
-    // 编辑
-    list.querySelectorAll('[data-edit]').forEach(btn=>{
-      btn.onclick = (ev)=>{ ev.stopPropagation(); openSportModal(p, btn.dataset.edit); };
-    });
-    // 删除
-    list.querySelectorAll('[data-del]').forEach(btn=>{
-      btn.onclick = (ev)=>{ ev.stopPropagation(); deleteCheckin(p, btn.dataset.del); };
-    });
-  }
 }
 
 /* 弹窗 */
-function openSportModal(p, editId){
-  sportPerson = p;
+function openSportModal(dataKey, editId, page){
+  sportPerson = dataKey;
   editingCheckinId = editId || null;
   const titleEl = document.getElementById('sportModalTitle');
   const saveBtn = document.getElementById('sportModalSave');
   if(editId){
-    const item = (state.checkins[p]||[]).find(c=>c.id===editId);
+    const item = (state.checkins[dataKey]||[]).find(c=>c.id===editId);
     titleEl.textContent = '编辑打卡项';
     document.getElementById('sportTitle').value = item.title;
     document.getElementById('sportEmoji').value = item.emoji || '🏃';
@@ -1865,13 +1872,17 @@ function openSportModal(p, editId){
     sportSelectedFreq = 3;
   }
   // 保存按钮颜色
-  const color = p==='A' ? 'var(--sp-pink)' : (p==='B' ? 'var(--sp-blue)' : 'var(--hk-pink)');
+  const color = dataKey==='A' ? 'var(--sp-pink)' : (dataKey==='B' ? 'var(--sp-blue)' : 'var(--sp-pink)');
   saveBtn.style.background = color;
   saveBtn.style.borderColor = color;
   renderFreqPicker();
   document.getElementById('sportModalMask').classList.add('show');
   document.getElementById('sportTitle').focus();
+  // 记录当前页面用于保存后刷新
+  sportModalPage = page || 'home';
 }
+
+let sportModalPage = 'home';
 
 function renderFreqPicker(){
   const row = document.getElementById('sportFreqRow');
@@ -1888,14 +1899,48 @@ function renderFreqPicker(){
   });
 }
 
-/* 事件绑定 */
-document.getElementById('sportAvatarA').onclick = ()=>renderSportPerson('A');
-document.getElementById('sportAvatarB').onclick = ()=>renderSportPerson('B');
-document.getElementById('sportBack').onclick = ()=>renderSportHome();
+function deleteCheckin(dataKey, id, page){
+  confirmModal('删除', '确定删除这个打卡项？', async ()=>{
+    state.checkins[dataKey] = (state.checkins[dataKey]||[]).filter(c=>c.id!==id);
+    // 清理该人日志中该项
+    const logs = state.checkinLogs[dataKey] || {};
+    Object.keys(logs).forEach(d=>{
+      logs[d] = logs[d].filter(cid=>cid!==id);
+      if(logs[d].length===0) delete logs[d];
+    });
+    await saveConfig();
+    renderPageList(page, dataKey);
+    renderPageStats(page, dataKey);
+    toast('已删除');
+  });
+}
 
-document.getElementById('btnAddCheckin').onclick = ()=>{
-  if(!sportPerson) return;
-  openSportModal(sportPerson, null);
+/* ===== 运动事件绑定 ===== */
+document.getElementById('sportAvatarA').onclick = ()=>{
+  sportView = 'A';
+  renderSport();
+};
+document.getElementById('sportAvatarB').onclick = ()=>{
+  sportView = 'B';
+  renderSport();
+};
+document.getElementById('sportBackA').onclick = ()=>{
+  sportView = null;
+  renderSport();
+};
+document.getElementById('sportBackB').onclick = ()=>{
+  sportView = null;
+  renderSport();
+};
+
+document.getElementById('btnAddHomeCheckin').onclick = ()=>{
+  openSportModal('shared', null, 'home');
+};
+document.getElementById('btnAddACheckin').onclick = ()=>{
+  openSportModal('A', null, 'A');
+};
+document.getElementById('btnAddBCheckin').onclick = ()=>{
+  openSportModal('B', null, 'B');
 };
 
 document.getElementById('sportModalCancel').onclick = ()=>{
@@ -1923,8 +1968,10 @@ document.getElementById('sportModalSave').onclick = async ()=>{
   }
   await saveConfig();
   document.getElementById('sportModalMask').classList.remove('show');
-  if(p==='shared') renderSportHome();
-  else renderCheckinList(p);
+  // 刷新当前所在页面
+  const page = sportModalPage;
+  renderPageList(page, p);
+  renderPageStats(page, p);
   toast('已保存');
 };
 
@@ -1932,41 +1979,13 @@ document.getElementById('sportModalMask').onclick = ev=>{
   if(ev.target.id==='sportModalMask') document.getElementById('sportModalMask').classList.remove('show');
 };
 
-document.getElementById('homeWkPrev').onclick = ()=>{ homeWeekOffset--; renderHomeWeekStrip(); };
-document.getElementById('homeWkNext').onclick = ()=>{ homeWeekOffset++; renderHomeWeekStrip(); };
-document.getElementById('personWkPrev').onclick = ()=>{ personWeekOffset--; renderPersonWeekStrip(sportView); };
-document.getElementById('personWkNext').onclick = ()=>{ personWeekOffset++; renderPersonWeekStrip(sportView); };
+document.getElementById('homeWkPrev').onclick = ()=>{ homeWeekOffset--; renderPageWeek('home','shared',homeWeekOffset); };
+document.getElementById('homeWkNext').onclick = ()=>{ homeWeekOffset++; renderPageWeek('home','shared',homeWeekOffset); };
+document.getElementById('aWkPrev').onclick = ()=>{ aWeekOffset--; renderPageWeek('A','A',aWeekOffset); };
+document.getElementById('aWkNext').onclick = ()=>{ aWeekOffset++; renderPageWeek('A','A',aWeekOffset); };
+document.getElementById('bWkPrev').onclick = ()=>{ bWeekOffset--; renderPageWeek('B','B',bWeekOffset); };
+document.getElementById('bWkNext').onclick = ()=>{ bWeekOffset++; renderPageWeek('B','B',bWeekOffset); };
 
-// 主页添加共同打卡
-document.getElementById('btnAddHomeCheckin').onclick = ()=>{
-  sportPerson = 'shared'; // 共同打卡标记
-  editingCheckinId = null;
-  document.getElementById('sportModalTitle').textContent = '添加共同打卡';
-  document.getElementById('sportTitle').value = '';
-  document.getElementById('sportEmoji').value = '🏃';
-  sportSelectedFreq = 3;
-  const saveBtn = document.getElementById('sportModalSave');
-  saveBtn.style.background = 'var(--hk-pink)';
-  saveBtn.style.borderColor = 'var(--hk-pink)';
-  renderFreqPicker();
-  document.getElementById('sportModalMask').classList.add('show');
-  document.getElementById('sportTitle').focus();
-};
-
-function deleteCheckin(p, id){
-  confirmModal('删除', '确定删除这个打卡项？', async ()=>{
-    state.checkins[p] = (state.checkins[p]||[]).filter(c=>c.id!==id);
-    // 清理该人日志中该项
-    const logs = state.checkinLogs[p] || {};
-    Object.keys(logs).forEach(d=>{
-      logs[d] = logs[d].filter(cid=>cid!==id);
-      if(logs[d].length===0) delete logs[d];
-    });
-    await saveConfig();
-    renderCheckinList(p);
-    toast('已删除');
-  });
-}
 
 /* ===== 事件绑定 ===== */
 document.getElementById('payerBtnA').onclick = ()=>selectPayer('A');
