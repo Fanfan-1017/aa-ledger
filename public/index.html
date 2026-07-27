@@ -309,88 +309,130 @@
   }
   .plan-modal .form-row input:focus{border-color:var(--teal)}
 
-  /* ===== 运动打卡模块 (Hello Kitty 粉) ===== */
+  /* ===== 运动打卡模块（双人） ===== */
   :root{
-    --hk-pink:#ff69b4; --hk-pink2:#ff85c0; --hk-bg:#fff0f5; --hk-card:#fff5f9;
-    --hk-border:#ffb6c1; --hk-text:#d63384; --hk-ribbon:#ff1493; --hk-grey:#c0c0c0;
+    --sp-pink:#ff69b4; --sp-pink2:#ff85c0; --sp-pink-bg:#fff0f5; --sp-pink-card:#fff5f9;
+    --sp-pink-border:#ffb6c1; --sp-pink-text:#d63384;
+    --sp-blue:#3b82f6; --sp-blue2:#60a5fa; --sp-blue-bg:#eff6ff; --sp-blue-card:#f0f7ff;
+    --sp-blue-border:#93c5fd; --sp-blue-text:#1e40af;
+    --sp-grey:#c0c0c0;
   }
-  .tab-btn.sport.active{color:var(--hk-pink)}
+  .tab-btn.sport.active{color:var(--sp-pink)}
 
-  /* Kitty 图片区域 */
-  .kitty-box{text-align:center;padding:16px 0 12px}
-  .kitty-img-wrap{
-    display:inline-block;position:relative;width:120px;height:120px;
-    border-radius:50%;overflow:hidden;border:4px solid var(--hk-border);
-    background:var(--hk-bg);box-shadow:0 4px 14px rgba(255,105,180,0.2);
+  /* 首页：双人头像 */
+  .sport-home{display:flex;flex-direction:column;align-items:center;padding:8px 0 4px}
+  .sport-home-avatars{display:flex;gap:40px;justify-content:center;margin-bottom:16px}
+  .sport-avatar-btn{
+    display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;
+    background:none;border:none;font-family:var(--font);
+    -webkit-tap-highlight-color:transparent;transition:transform 0.12s;
   }
-  .kitty-img-wrap img{
-    width:100%;height:100%;object-fit:cover;transition:filter 0.3s,opacity 0.3s;
+  .sport-avatar-btn:active{transform:scale(0.95)}
+  .sport-avatar-ring{
+    width:90px;height:90px;border-radius:50%;display:flex;align-items:center;
+    justify-content:center;font-size:36px;overflow:hidden;position:relative;
+    border:4px solid var(--border);background:var(--card);
+    box-shadow:0 4px 14px rgba(0,0,0,0.08);transition:all 0.15s;
   }
-  .kitty-img-wrap.grey img{filter:grayscale(100%);opacity:0.4}
-  .kitty-progress{margin-top:10px;font-size:15px;color:var(--hk-text);font-weight:600}
-  .kitty-progress .done{color:var(--hk-pink)}
-  .kitty-progress .undone{color:var(--hk-grey)}
+  .sport-avatar-ring.A{border-color:var(--sp-pink);box-shadow:0 4px 14px rgba(255,105,180,0.2)}
+  .sport-avatar-ring.B{border-color:var(--sp-blue);box-shadow:0 4px 14px rgba(59,130,246,0.2)}
+  .sport-avatar-ring img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+  .sport-avatar-ring .default-icon{color:var(--text3)}
+  .sport-avatar-name{font-size:15px;font-weight:600;color:var(--text)}
+  .sport-avatar-name.A{color:var(--sp-pink-text)}
+  .sport-avatar-name.B{color:var(--sp-blue-text)}
+  .sport-home-hint{font-size:13px;color:var(--text2);margin-bottom:14px;text-align:center}
 
-  /* 三宫格统计 */
-  .hk-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:12px 0}
-  .hk-stat-card{
-    background:var(--hk-card);border:1px solid var(--hk-border);border-radius:var(--radius);
-    padding:12px 8px;text-align:center;transition:all 0.12s;
+  /* 个人视图 */
+  .sport-person{display:none}
+  .sport-person.show{display:block}
+  .sport-person-head{
+    display:flex;align-items:center;gap:10px;margin-bottom:14px;
   }
-  .hk-stat-card:active{transform:scale(0.97)}
-  .hk-stat-card .stat-num{font-size:22px;font-weight:700;color:var(--hk-pink);line-height:1.2}
-  .hk-stat-card .stat-label{font-size:12px;color:var(--hk-text);margin-top:2px}
+  .sport-back-btn{
+    width:36px;height:36px;border-radius:50%;border:1px solid var(--border);
+    background:var(--card);cursor:pointer;font-size:18px;color:var(--text2);
+    display:flex;align-items:center;justify-content:center;transition:all 0.12s;
+    -webkit-tap-highlight-color:transparent;flex-shrink:0;
+  }
+  .sport-back-btn:active{background:var(--bg)}
+  .sport-person-title{font-size:18px;font-weight:700;flex:1}
+  .sport-person-title.A{color:var(--sp-pink-text)}
+  .sport-person-title.B{color:var(--sp-blue-text)}
 
   /* 每周打卡条 */
-  .hk-week{background:var(--hk-card);border:1px solid var(--hk-border);border-radius:var(--radius);padding:14px 10px;margin-bottom:14px}
-  .hk-week-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
-  .hk-week-head .wk-title{font-size:14px;font-weight:600;color:var(--hk-text)}
-  .hk-week-head .wk-arrows{display:flex;gap:6px}
-  .hk-week-head .wk-arrow{
-    width:28px;height:28px;border-radius:50%;border:1px solid var(--hk-border);
-    background:var(--card);cursor:pointer;font-size:14px;color:var(--hk-pink);
+  .sp-week{border-radius:var(--radius);padding:14px 10px;margin-bottom:14px;border:1px solid var(--border)}
+  .sp-week.A{background:var(--sp-pink-card);border-color:var(--sp-pink-border)}
+  .sp-week.B{background:var(--sp-blue-card);border-color:var(--sp-blue-border)}
+  .sp-week.neutral{background:var(--card)}
+  .sp-week-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+  .sp-week-head .wk-title{font-size:14px;font-weight:600}
+  .sp-week.A .wk-title{color:var(--sp-pink-text)}
+  .sp-week.B .wk-title{color:var(--sp-blue-text)}
+  .sp-week.neutral .wk-title{color:var(--text)}
+  .sp-week-head .wk-arrows{display:flex;gap:6px}
+  .sp-week-head .wk-arrow{
+    width:28px;height:28px;border-radius:50%;border:1px solid var(--border);
+    background:var(--card);cursor:pointer;font-size:14px;
     display:flex;align-items:center;justify-content:center;transition:all 0.12s;
     -webkit-tap-highlight-color:transparent;font-family:var(--font);
   }
-  .hk-week-head .wk-arrow:active{background:var(--hk-bg)}
-  .hk-week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
-  .hk-day{
+  .sp-week.A .wk-arrow{border-color:var(--sp-pink-border);color:var(--sp-pink)}
+  .sp-week.B .wk-arrow{border-color:var(--sp-blue-border);color:var(--sp-blue)}
+  .sp-week-head .wk-arrow:active{opacity:0.7}
+  .sp-week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+  .sp-day{
     display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 2px;
     border-radius:var(--radius-sm);cursor:pointer;transition:all 0.12s;
     -webkit-tap-highlight-color:transparent;
   }
-  .hk-day:active{background:var(--hk-bg)}
-  .hk-day .hk-date{font-size:12px;color:var(--hk-text);font-weight:600}
-  .hk-day .hk-dow{font-size:10px;color:var(--hk-text)}
-  .hk-day.today{border:2px solid #ffd700;border-radius:8px;padding:4px 2px}
-  .hk-day.other-month .hk-date,.hk-day.other-month .hk-dow{color:var(--text3)}
-  .hk-day-circle{
-    width:22px;height:22px;border-radius:50%;border:2px solid var(--hk-pink);
+  .sp-day:active{opacity:0.7}
+  .sp-day .sp-date{font-size:12px;font-weight:600}
+  .sp-day .sp-dow{font-size:10px}
+  .sp-week.A .sp-date,.sp-week.A .sp-dow{color:var(--sp-pink-text)}
+  .sp-week.B .sp-date,.sp-week.B .sp-dow{color:var(--sp-blue-text)}
+  .sp-week.neutral .sp-date,.sp-week.neutral .sp-dow{color:var(--text2)}
+  .sp-day.today{border:2px solid #ffd700;border-radius:8px;padding:4px 2px}
+  .sp-day-circle{
+    width:22px;height:22px;border-radius:50%;border:2px solid;
     display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff;
     transition:all 0.15s;margin-top:2px;
   }
-  .hk-day-circle.checked{background:var(--hk-pink);border-color:var(--hk-pink)}
+  .sp-week.A .sp-day-circle{border-color:var(--sp-pink)}
+  .sp-week.A .sp-day-circle.checked{background:var(--sp-pink);border-color:var(--sp-pink)}
+  .sp-week.B .sp-day-circle{border-color:var(--sp-blue)}
+  .sp-week.B .sp-day-circle.checked{background:var(--sp-blue);border-color:var(--sp-blue)}
+  .sp-week.neutral .sp-day-circle{border-color:var(--text3)}
+  .sp-week.neutral .sp-day-circle.checked{background:var(--green);border-color:var(--green)}
 
   /* 任务列表 */
   .checkin-list{margin:10px 0}
   .checkin-item{
     display:flex;align-items:center;gap:10px;padding:12px 14px;
-    background:var(--hk-card);border:1px solid var(--hk-border);
-    border-radius:var(--radius);margin-bottom:8px;transition:all 0.12s;
+    border:1px solid var(--border);border-radius:var(--radius);margin-bottom:8px;
+    transition:all 0.12s;
   }
-  .checkin-item.done{background:#ffe4ec;border-color:var(--hk-pink2)}
+  .checkin-item.A{background:var(--sp-pink-card);border-color:var(--sp-pink-border)}
+  .checkin-item.A.done{background:#ffe4ec;border-color:var(--sp-pink2)}
+  .checkin-item.B{background:var(--sp-blue-card);border-color:var(--sp-blue-border)}
+  .checkin-item.B.done{background:#dbeafe;border-color:var(--sp-blue2)}
   .checkin-cb{
-    width:24px;height:24px;border-radius:50%;border:2px solid var(--hk-pink);
+    width:24px;height:24px;border-radius:50%;border:2px solid;
     display:flex;align-items:center;justify-content:center;cursor:pointer;
     flex-shrink:0;font-size:14px;color:#fff;transition:all 0.15s;
     -webkit-tap-highlight-color:transparent;
   }
-  .checkin-cb.checked{background:var(--hk-pink);border-color:var(--hk-pink)}
+  .checkin-cb.A{border-color:var(--sp-pink)}
+  .checkin-cb.A.checked{background:var(--sp-pink);border-color:var(--sp-pink)}
+  .checkin-cb.B{border-color:var(--sp-blue)}
+  .checkin-cb.B.checked{background:var(--sp-blue);border-color:var(--sp-blue)}
   .checkin-emoji{font-size:18px;flex-shrink:0}
   .checkin-info{flex:1;min-width:0}
   .checkin-title{font-size:14px;color:var(--text);font-weight:500}
-  .checkin-item.done .checkin-title{color:var(--hk-text)}
-  .checkin-freq{font-size:11px;color:var(--hk-text);margin-top:1px;opacity:0.8}
+  .checkin-item.done .checkin-title{opacity:0.7}
+  .checkin-freq{font-size:11px;margin-top:1px;opacity:0.8}
+  .checkin-item.A .checkin-freq{color:var(--sp-pink-text)}
+  .checkin-item.B .checkin-freq{color:var(--sp-blue-text)}
   .checkin-actions{display:flex;gap:2px;flex-shrink:0}
   .checkin-actions button{
     width:28px;height:28px;border-radius:50%;border:none;background:transparent;
@@ -398,40 +440,43 @@
     display:flex;align-items:center;justify-content:center;
     -webkit-tap-highlight-color:transparent;
   }
-  .checkin-actions button:hover{background:var(--hk-bg);color:var(--hk-pink)}
+  .checkin-item.A .checkin-actions button:hover{background:var(--sp-pink-bg);color:var(--sp-pink)}
+  .checkin-item.B .checkin-actions button:hover{background:var(--sp-blue-bg);color:var(--sp-blue)}
 
   .add-checkin-btn{
-    display:block;width:100%;padding:12px;border:2px dashed var(--hk-border);
-    border-radius:var(--radius);background:transparent;color:var(--hk-pink);
+    display:block;width:100%;padding:12px;border:2px dashed var(--border);
+    border-radius:var(--radius);background:transparent;color:var(--text2);
     font-size:14px;cursor:pointer;font-family:var(--font);text-align:center;
     transition:all 0.12s;-webkit-tap-highlight-color:transparent;margin-bottom:14px;
   }
-  .add-checkin-btn:active{background:var(--hk-bg)}
+  .add-checkin-btn.A{border-color:var(--sp-pink-border);color:var(--sp-pink)}
+  .add-checkin-btn.A:active{background:var(--sp-pink-bg)}
+  .add-checkin-btn.B{border-color:var(--sp-blue-border);color:var(--sp-blue)}
+  .add-checkin-btn.B:active{background:var(--sp-blue-bg)}
 
   /* 运动弹窗 */
   .sport-modal .form-row{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
-  .sport-modal .form-row label{font-size:13px;color:var(--hk-text);font-weight:500}
+  .sport-modal .form-row label{font-size:13px;font-weight:500}
   .sport-modal .form-row input{
-    padding:10px;border:1px solid var(--hk-border);border-radius:var(--radius-sm);
+    padding:10px;border:1px solid var(--border);border-radius:var(--radius-sm);
     font-size:14px;color:var(--text);outline:none;font-family:var(--font)
   }
-  .sport-modal .form-row input:focus{border-color:var(--hk-pink)}
   .sport-modal .emoji-row{display:flex;flex-wrap:wrap;gap:6px}
   .sport-modal .emoji-pick{
-    width:36px;height:36px;border:1px solid var(--hk-border);border-radius:var(--radius-sm);
-    background:var(--hk-card);cursor:pointer;font-size:18px;display:flex;
+    width:36px;height:36px;border:1px solid var(--border);border-radius:var(--radius-sm);
+    background:var(--card);cursor:pointer;font-size:18px;display:flex;
     align-items:center;justify-content:center;transition:all 0.12s;
     -webkit-tap-highlight-color:transparent;
   }
-  .sport-modal .emoji-pick.active{border-color:var(--hk-pink);background:var(--hk-bg);box-shadow:0 0 0 2px rgba(255,105,180,0.2)}
+  .sport-modal .emoji-pick.active{border-color:var(--sp-pink);background:var(--sp-pink-bg);box-shadow:0 0 0 2px rgba(255,105,180,0.2)}
   .sport-modal .freq-row{display:flex;gap:6px}
   .sport-modal .freq-btn{
-    flex:1;padding:8px;border:1px solid var(--hk-border);border-radius:var(--radius-sm);
-    background:var(--hk-card);cursor:pointer;font-size:14px;color:var(--hk-text);
+    flex:1;padding:8px;border:1px solid var(--border);border-radius:var(--radius-sm);
+    background:var(--card);cursor:pointer;font-size:14px;color:var(--text2);
     text-align:center;transition:all 0.12s;font-family:var(--font);
     -webkit-tap-highlight-color:transparent;
   }
-  .sport-modal .freq-btn.active{background:var(--hk-pink);border-color:var(--hk-pink);color:#fff;font-weight:600}
+  .sport-modal .freq-btn.active{background:var(--sp-pink);border-color:var(--sp-pink);color:#fff;font-weight:600}
 </style>
 </head>
 <body>
@@ -499,43 +544,62 @@
 
   <!-- ==================== 运动打卡面板 ==================== -->
   <div class="tab-panel" id="panelSport">
-    <div class="kitty-box">
-      <div class="kitty-img-wrap" id="kittyImgWrap">
-        <img id="kittyImg" src="https://workbuddy-bga-1258344699.cos.ap-beijing.myqcloud.com/attachments/daaba5d3-eb53-4e67-8330-720f28e8879c/1785161839_3c35d207/Screenshot_20260727_231711.jpg" alt="Hello Kitty">
-      </div>
-      <div class="kitty-progress" id="kittyProgress">今日打卡 0/0</div>
-    </div>
 
-    <div class="hk-stats">
-      <div class="hk-stat-card">
-        <div class="stat-num" id="statTotal">0</div>
-        <div class="stat-label">查看任务</div>
+    <!-- 首页：双人头像 -->
+    <div class="sport-home" id="sportHome">
+      <div class="sport-home-avatars">
+        <button class="sport-avatar-btn" id="sportAvatarB">
+          <div class="sport-avatar-ring B" id="sportRingB">
+            <span class="default-icon">👤</span>
+          </div>
+          <span class="sport-avatar-name B" id="sportNameB">源源</span>
+        </button>
+        <button class="sport-avatar-btn" id="sportAvatarA">
+          <div class="sport-avatar-ring A" id="sportRingA">
+            <span class="default-icon">👤</span>
+          </div>
+          <span class="sport-avatar-name A" id="sportNameA">帆帆</span>
+        </button>
       </div>
-      <div class="hk-stat-card">
-        <div class="stat-num" id="statDone">0</div>
-        <div class="stat-label">已完成</div>
-      </div>
-      <div class="hk-stat-card">
-        <div class="stat-num" id="statHistory">0</div>
-        <div class="stat-label">历史任务</div>
-      </div>
-    </div>
+      <div class="sport-home-hint">点击名字进入编辑自己的打卡计划</div>
 
-    <div class="hk-week">
-      <div class="hk-week-head">
-        <span class="wk-title" id="wkTitle">本周打卡</span>
-        <div class="wk-arrows">
-          <button class="wk-arrow" id="wkPrev">‹</button>
-          <button class="wk-arrow" id="wkNext">›</button>
+      <!-- 合并周打卡条 -->
+      <div class="sp-week neutral" style="width:100%">
+        <div class="sp-week-head">
+          <span class="wk-title" id="homeWkTitle">本周打卡</span>
+          <div class="wk-arrows">
+            <button class="wk-arrow" id="homeWkPrev">‹</button>
+            <button class="wk-arrow" id="homeWkNext">›</button>
+          </div>
         </div>
+        <div class="sp-week-grid" id="homeWeekGrid"></div>
       </div>
-      <div class="hk-week-grid" id="hkWeekGrid"></div>
     </div>
 
-    <div class="checkin-list" id="checkinList"></div>
-    <div class="empty" id="checkinEmpty">还没有打卡项，点击下方添加</div>
+    <!-- 个人视图 -->
+    <div class="sport-person" id="sportPerson">
+      <div class="sport-person-head">
+        <button class="sport-back-btn" id="sportBack">‹</button>
+        <span class="sport-person-title" id="sportPersonTitle"></span>
+      </div>
 
-    <button class="add-checkin-btn" id="btnAddCheckin">+ 添加打卡项</button>
+      <div class="sp-week" id="personWeek">
+        <div class="sp-week-head">
+          <span class="wk-title" id="personWkTitle">本周打卡</span>
+          <div class="wk-arrows">
+            <button class="wk-arrow" id="personWkPrev">‹</button>
+            <button class="wk-arrow" id="personWkNext">›</button>
+          </div>
+        </div>
+        <div class="sp-week-grid" id="personWeekGrid"></div>
+      </div>
+
+      <div class="checkin-list" id="checkinList"></div>
+      <div class="empty" id="checkinEmpty">还没有打卡项，点击下方添加</div>
+
+      <button class="add-checkin-btn" id="btnAddCheckin">+ 添加打卡项</button>
+    </div>
+
   </div>
 
   <!-- 运动打卡弹窗 -->
@@ -556,7 +620,7 @@
       </div>
       <div class="actions">
         <button id="sportModalCancel">取消</button>
-        <button class="primary" id="sportModalSave" style="background:var(--hk-pink);border-color:var(--hk-pink)">保存</button>
+        <button class="primary" id="sportModalSave" style="background:var(--sp-pink);border-color:var(--sp-pink)">保存</button>
       </div>
     </div>
   </div>
@@ -724,8 +788,8 @@ let state = {
   customCats: ['吃饭','便利店','超市','家用','娱乐'],
   anniversaries: [],
   plans: [],
-  checkins: [],
-  checkinLogs: {},
+  checkins: {A:[], B:[]},
+  checkinLogs: {A:{}, B:{}},
 };
 
 let pollTimer = null;
@@ -745,8 +809,28 @@ async function loadConfig(){
     if(cfg.customCats){ try{ state.customCats = JSON.parse(cfg.customCats); }catch(e){} }
     if(cfg.anniversaries){ try{ state.anniversaries = JSON.parse(cfg.anniversaries); }catch(e){} }
     if(cfg.plans){ try{ state.plans = JSON.parse(cfg.plans); }catch(e){} }
-    if(cfg.checkins){ try{ state.checkins = JSON.parse(cfg.checkins); }catch(e){} }
-    if(cfg.checkinLogs){ try{ state.checkinLogs = JSON.parse(cfg.checkinLogs); }catch(e){} }
+    if(cfg.checkins){
+      try{
+        const c = JSON.parse(cfg.checkins);
+        // 迁移旧格式：数组 -> {A:[...], B:[]}
+        if(Array.isArray(c)){
+          state.checkins = {A:[...c], B:[]};
+        } else {
+          state.checkins = {A: c.A||[], B: c.B||[]};
+        }
+      }catch(e){}
+    }
+    if(cfg.checkinLogs){
+      try{
+        const l = JSON.parse(cfg.checkinLogs);
+        // 迁移旧格式：扁平对象 -> {A:{...}, B:{}}
+        if(l && !l.A && !l.B){
+          state.checkinLogs = {A:{...l}, B:{}};
+        } else {
+          state.checkinLogs = {A: l.A||{}, B: l.B||{}};
+        }
+      }catch(e){}
+    }
   }catch(e){ console.warn('load config', e); }
 }
 
@@ -796,7 +880,7 @@ function switchTab(tab){
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.toggle('active', p.id==='panel'+tab.charAt(0).toUpperCase()+tab.slice(1)));
   if(tab==='anniversary') renderAnniversaries();
   if(tab==='plan') renderCalendar();
-  if(tab==='sport') renderCheckins();
+  if(tab==='sport') renderSport();
 }
 
 document.querySelectorAll('.tab-btn').forEach(btn=>{
@@ -841,19 +925,25 @@ async function poll(){
     if(cfg.checkins){
       try{
         const c = JSON.parse(cfg.checkins);
-        if(JSON.stringify(c)!==JSON.stringify(state.checkins)){ state.checkins=c; cfgChanged=true; }
+        let normalized;
+        if(Array.isArray(c)) normalized = {A:[...c], B:[]};
+        else normalized = {A: c.A||[], B: c.B||[]};
+        if(JSON.stringify(normalized)!==JSON.stringify(state.checkins)){ state.checkins=normalized; cfgChanged=true; }
       }catch(e){}
     }
     if(cfg.checkinLogs){
       try{
         const l = JSON.parse(cfg.checkinLogs);
-        if(JSON.stringify(l)!==JSON.stringify(state.checkinLogs)){ state.checkinLogs=l; cfgChanged=true; }
+        let normalized;
+        if(l && !l.A && !l.B) normalized = {A:{...l}, B:{}};
+        else normalized = {A: l.A||{}, B: l.B||{}};
+        if(JSON.stringify(normalized)!==JSON.stringify(state.checkinLogs)){ state.checkinLogs=normalized; cfgChanged=true; }
       }catch(e){}
     }
     if(cfgChanged){
       if(activeTab==='anniversary') renderAnniversaries();
       if(activeTab==='plan') renderCalendar();
-      if(activeTab==='sport') renderCheckins();
+      if(activeTab==='sport') renderSport();
     }
     document.getElementById('syncDot').classList.remove('off');
   }catch(e){
@@ -1442,27 +1532,20 @@ document.getElementById('calNext').onclick = ()=>{
   renderCalendar();
 };
 
-/* ===== 运动打卡模块 ===== */
-const KITTY_EMOJIS = ['🏃','💪','🧘','🚴','🏊','⚽','🏀','🤸','跳绳','散步'];
-let sportWeekOffset = 0;       // 0 = current week, -1 = prev, 1 = next
+/* ===== 运动打卡模块（双人） ===== */
+const SPORT_EMOJIS = ['🏃','💪','🧘','🚴','🏊','⚽','🏀','🤸','跳绳','散步'];
+let sportView = null;          // null=home, 'A'=帆帆, 'B'=源源
+let sportPerson = null;        // 当前操作的人
+let homeWeekOffset = 0;        // 首页周打卡偏移
+let personWeekOffset = 0;      // 个人页周打卡偏移
 let editingCheckinId = null;
 let sportSelectedEmoji = '🏃';
 let sportSelectedFreq = 3;
 
-function getTodayCheckins(){
-  return state.checkinLogs[todayStr()] || [];
-}
-
-function isAllDone(){
-  if(state.checkins.length===0) return true;
-  return getTodayCheckins().length >= state.checkins.length;
-}
-
 /* 获取某周（offset 周）的周一到周日的日期数组 */
 function getWeekDates(offset){
   const now = new Date();
-  const day = now.getDay(); // 0=Sun..6=Sat
-  // 周一为一周起点：周一 = now - (day-1)，day=0(Sun) 时差 6 天
+  const day = now.getDay();
   const diffToMon = day === 0 ? -6 : 1 - day;
   const monday = new Date(now);
   monday.setDate(now.getDate() + diffToMon + offset * 7);
@@ -1480,34 +1563,168 @@ function dateToStr(d){
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 }
 
-/* 某天是否全部任务完成 */
-function isDayAllDone(dateStr){
-  if(state.checkins.length===0) return false;
-  const logs = state.checkinLogs[dateStr] || [];
-  return logs.length >= state.checkins.length;
-}
-
-/* 某天是否有打卡记录 */
-function isDayChecked(dateStr){
-  const logs = state.checkinLogs[dateStr] || [];
+/* 某人某天是否有打卡记录 */
+function isPersonDayChecked(p, dateStr){
+  const logs = (state.checkinLogs[p]||{})[dateStr] || [];
   return logs.length > 0;
 }
 
-function renderCheckins(){
+/* 合并：任一人完成即算 checked */
+function isCombinedDayChecked(dateStr){
+  return isPersonDayChecked('A', dateStr) || isPersonDayChecked('B', dateStr);
+}
+
+/* 渲染头像（首页用） */
+function renderSportAvatar(p){
+  const ring = document.getElementById('sportRing'+p);
+  const nameEl = document.getElementById('sportName'+p);
+  if(!ring) return;
+  nameEl.textContent = nameOf(p);
+  const url = state.avatars[p];
+  if(url){
+    ring.innerHTML = `<img src="${esc(url)}" alt="${esc(nameOf(p))}">`;
+  } else {
+    ring.innerHTML = `<span class="default-icon">👤</span>`;
+  }
+}
+
+/* 主渲染入口 */
+function renderSport(){
+  // 确保数据结构
+  if(!state.checkins.A) state.checkins = {A:[], B:[]};
+  if(!state.checkins.B) state.checkins = {A: state.checkins.A||[], B: state.checkins.B||[]};
+  if(!state.checkinLogs.A) state.checkinLogs = {A:{}, B:{}};
+  if(!state.checkinLogs.B) state.checkinLogs = {A: state.checkinLogs.A||{}, B: state.checkinLogs.B||{}};
+
+  if(sportView){
+    renderSportPerson(sportView);
+  } else {
+    renderSportHome();
+  }
+}
+
+/* 首页 */
+function renderSportHome(){
+  sportView = null;
+  document.getElementById('sportHome').style.display = 'flex';
+  document.getElementById('sportPerson').classList.remove('show');
+  renderSportAvatar('A');
+  renderSportAvatar('B');
+  renderHomeWeekStrip();
+}
+
+/* 渲染首页合并周条 */
+function renderHomeWeekStrip(){
+  const grid = document.getElementById('homeWeekGrid');
+  const title = document.getElementById('homeWkTitle');
+  const dates = getWeekDates(homeWeekOffset);
+  const today = todayStr();
+  const dows = ['周一','周二','周三','周四','周五','周六','周日'];
+  const start = dates[0], end = dates[6];
+  title.textContent = `${start.getMonth()+1}/${start.getDate()} - ${end.getMonth()+1}/${end.getDate()}`;
+  let html = '';
+  dates.forEach((d, i)=>{
+    const ds = dateToStr(d);
+    const isToday = ds === today;
+    const checked = isCombinedDayChecked(ds);
+    const classes = ['sp-day'];
+    if(isToday) classes.push('today');
+    html += `<div class="${classes.join(' ')}" data-date="${ds}">
+      <span class="sp-date">${d.getMonth()+1}/${d.getDate()}</span>
+      <span class="sp-dow">${dows[i]}</span>
+      <div class="sp-day-circle${checked?' checked':''}">${checked?'✓':''}</div>
+    </div>`;
+  });
+  grid.innerHTML = html;
+}
+
+/* 个人视图 */
+function renderSportPerson(p){
+  sportView = p;
+  sportPerson = p;
+  document.getElementById('sportHome').style.display = 'none';
+  document.getElementById('sportPerson').classList.add('show');
+
+  // 标题
+  const titleEl = document.getElementById('sportPersonTitle');
+  titleEl.textContent = nameOf(p);
+  titleEl.className = 'sport-person-title ' + p;
+
+  // 周条样式
+  const weekEl = document.getElementById('personWeek');
+  weekEl.className = 'sp-week ' + p;
+
+  // 添加按钮样式
+  const addBtn = document.getElementById('btnAddCheckin');
+  addBtn.className = 'add-checkin-btn ' + p;
+
+  renderPersonWeekStrip(p);
+  renderCheckinList(p);
+}
+
+/* 渲染个人周条 */
+function renderPersonWeekStrip(p){
+  const grid = document.getElementById('personWeekGrid');
+  const title = document.getElementById('personWkTitle');
+  const dates = getWeekDates(personWeekOffset);
+  const today = todayStr();
+  const dows = ['周一','周二','周三','周四','周五','周六','周日'];
+  const start = dates[0], end = dates[6];
+  title.textContent = `${start.getMonth()+1}/${start.getDate()} - ${end.getMonth()+1}/${end.getDate()}`;
+  let html = '';
+  dates.forEach((d, i)=>{
+    const ds = dateToStr(d);
+    const isToday = ds === today;
+    const checked = isPersonDayChecked(p, ds);
+    const classes = ['sp-day'];
+    if(isToday) classes.push('today');
+    html += `<div class="${classes.join(' ')}" data-date="${ds}">
+      <span class="sp-date">${d.getMonth()+1}/${d.getDate()}</span>
+      <span class="sp-dow">${dows[i]}</span>
+      <div class="sp-day-circle${checked?' checked':''}">${checked?'✓':''}</div>
+    </div>`;
+  });
+  grid.innerHTML = html;
+  // 点击日期：切换当天全部打卡状态
+  grid.querySelectorAll('.sp-day').forEach(el=>{
+    el.onclick = async ()=>{
+      const ds = el.dataset.date;
+      const tasks = state.checkins[p] || [];
+      if(tasks.length===0){ toast('请先添加打卡项'); return; }
+      let logs = (state.checkinLogs[p]||{})[ds] || [];
+      if(logs.length >= tasks.length){
+        // 全部完成 -> 清空
+        logs = [];
+      } else {
+        logs = tasks.map(c=>c.id);
+      }
+      if(!state.checkinLogs[p]) state.checkinLogs[p] = {};
+      if(logs.length===0) delete state.checkinLogs[p][ds];
+      else state.checkinLogs[p][ds] = logs;
+      await saveConfig();
+      renderPersonWeekStrip(p);
+    };
+  });
+}
+
+/* 渲染个人任务列表 */
+function renderCheckinList(p){
   const list = document.getElementById('checkinList');
   const empty = document.getElementById('checkinEmpty');
-  if(state.checkins.length===0){
+  const tasks = state.checkins[p] || [];
+  if(tasks.length===0){
     list.innerHTML = '';
     empty.style.display = 'block';
   } else {
     empty.style.display = 'none';
-    const done = getTodayCheckins();
+    const today = todayStr();
+    const done = (state.checkinLogs[p]||{})[today] || [];
     let html = '';
-    state.checkins.forEach(c=>{
+    tasks.forEach(c=>{
       const checked = done.includes(c.id);
       const freq = c.freq || 1;
-      html += `<div class="checkin-item${checked?' done':''}">
-        <div class="checkin-cb${checked?' checked':''}" data-cid="${c.id}">${checked?'✓':''}</div>
+      html += `<div class="checkin-item ${p}${checked?' done':''}">
+        <div class="checkin-cb ${p}${checked?' checked':''}" data-cid="${c.id}">${checked?'✓':''}</div>
         <span class="checkin-emoji">${c.emoji||'✅'}</span>
         <div class="checkin-info">
           <div class="checkin-title">${esc(c.title)}</div>
@@ -1525,110 +1742,38 @@ function renderCheckins(){
       cb.onclick = async ()=>{
         const cid = cb.dataset.cid;
         const today = todayStr();
-        let logs = state.checkinLogs[today] || [];
+        if(!state.checkinLogs[p]) state.checkinLogs[p] = {};
+        let logs = state.checkinLogs[p][today] || [];
         if(logs.includes(cid)){
           logs = logs.filter(id=>id!==cid);
         } else {
           logs = [...logs, cid];
         }
-        state.checkinLogs[today] = logs;
+        if(logs.length===0) delete state.checkinLogs[p][today];
+        else state.checkinLogs[p][today] = logs;
         await saveConfig();
-        renderCheckins();
+        renderCheckinList(p);
       };
     });
     // 编辑
     list.querySelectorAll('[data-edit]').forEach(btn=>{
-      btn.onclick = (ev)=>{ ev.stopPropagation(); openSportModal(btn.dataset.edit); };
+      btn.onclick = (ev)=>{ ev.stopPropagation(); openSportModal(p, btn.dataset.edit); };
     });
     // 删除
     list.querySelectorAll('[data-del]').forEach(btn=>{
-      btn.onclick = (ev)=>{ ev.stopPropagation(); deleteCheckin(btn.dataset.del); };
+      btn.onclick = (ev)=>{ ev.stopPropagation(); deleteCheckin(p, btn.dataset.del); };
     });
   }
-  renderKitty();
-  renderStats();
-  renderWeekStrip();
-}
-
-function renderKitty(){
-  const wrap = document.getElementById('kittyImgWrap');
-  const progress = document.getElementById('kittyProgress');
-  const done = getTodayCheckins().length;
-  const total = state.checkins.length;
-  if(total===0){
-    wrap.classList.add('grey');
-    progress.innerHTML = '还没有打卡项哦～';
-    return;
-  }
-  if(done>=total){
-    wrap.classList.remove('grey');
-    progress.innerHTML = `今日全部完成 <span class="done">🎉 ${done}/${total}</span>`;
-  } else {
-    wrap.classList.add('grey');
-    progress.innerHTML = `今日打卡 <span class="undone">${done}/${total}</span> 加油！`;
-  }
-}
-
-function renderStats(){
-  document.getElementById('statTotal').textContent = state.checkins.length;
-  document.getElementById('statDone').textContent = getTodayCheckins().length;
-  // 历史任务 = 有打卡记录的不同天数
-  const histDays = Object.keys(state.checkinLogs).filter(d=>(state.checkinLogs[d]||[]).length>0).length;
-  document.getElementById('statHistory').textContent = histDays;
-}
-
-function renderWeekStrip(){
-  const grid = document.getElementById('hkWeekGrid');
-  const title = document.getElementById('wkTitle');
-  const dates = getWeekDates(sportWeekOffset);
-  const today = todayStr();
-  const dows = ['周一','周二','周三','周四','周五','周六','周日'];
-  // 标题：显示该周范围
-  const start = dates[0], end = dates[6];
-  title.textContent = `${start.getMonth()+1}/${start.getDate()} - ${end.getMonth()+1}/${end.getDate()}`;
-  let html = '';
-  dates.forEach((d, i)=>{
-    const ds = dateToStr(d);
-    const isToday = ds === today;
-    const checked = isDayChecked(ds);
-    const allDone = isDayAllDone(ds);
-    const isPast = d < new Date(today+'T00:00:00');
-    const classes = ['hk-day'];
-    if(isToday) classes.push('today');
-    // 判断是否本周以内（用于显示样式，不做 other-month）
-    html += `<div class="${classes.join(' ')}" data-date="${ds}">
-      <span class="hk-date">${d.getMonth()+1}/${d.getDate()}</span>
-      <span class="hk-dow">${dows[i]}</span>
-      <div class="hk-day-circle${checked?' checked':''}">${checked?'✓':''}</div>
-    </div>`;
-  });
-  grid.innerHTML = html;
-  // 点击日期：切换当天打卡状态
-  // 点击逻辑：如果当天有任务未全完成 -> 将所有未完成任务标记完成；如果已全完成 -> 清空当天记录
-  grid.querySelectorAll('.hk-day').forEach(el=>{
-    el.onclick = async ()=>{
-      const ds = el.dataset.date;
-      if(state.checkins.length===0){ toast('请先添加打卡项'); return; }
-      const logs = state.checkinLogs[ds] || [];
-      if(logs.length >= state.checkins.length){
-        // 全部完成 -> 清空
-        delete state.checkinLogs[ds];
-      } else {
-        // 标记全部完成
-        state.checkinLogs[ds] = state.checkins.map(c=>c.id);
-      }
-      await saveConfig();
-      renderCheckins();
-    };
-  });
 }
 
 /* 弹窗 */
-function openSportModal(editId){
+function openSportModal(p, editId){
+  sportPerson = p;
   editingCheckinId = editId || null;
   const titleEl = document.getElementById('sportModalTitle');
+  const saveBtn = document.getElementById('sportModalSave');
   if(editId){
-    const item = state.checkins.find(c=>c.id===editId);
+    const item = (state.checkins[p]||[]).find(c=>c.id===editId);
     titleEl.textContent = '编辑打卡项';
     document.getElementById('sportTitle').value = item.title;
     sportSelectedEmoji = item.emoji || '🏃';
@@ -1639,6 +1784,10 @@ function openSportModal(editId){
     sportSelectedEmoji = '🏃';
     sportSelectedFreq = 3;
   }
+  // 保存按钮颜色跟随当前人
+  const color = p==='A' ? 'var(--sp-pink)' : 'var(--sp-blue)';
+  saveBtn.style.background = color;
+  saveBtn.style.borderColor = color;
   renderEmojiPicker();
   renderFreqPicker();
   document.getElementById('sportModalMask').classList.add('show');
@@ -1647,7 +1796,7 @@ function openSportModal(editId){
 
 function renderEmojiPicker(){
   const row = document.getElementById('sportEmojiRow');
-  row.innerHTML = KITTY_EMOJIS.map(e=>
+  row.innerHTML = SPORT_EMOJIS.map(e=>
     `<div class="emoji-pick${e===sportSelectedEmoji?' active':''}" data-emoji="${esc(e)}">${e}</div>`
   ).join('');
   row.querySelectorAll('.emoji-pick').forEach(el=>{
@@ -1673,7 +1822,15 @@ function renderFreqPicker(){
   });
 }
 
-document.getElementById('btnAddCheckin').onclick = ()=>openSportModal(null);
+/* 事件绑定 */
+document.getElementById('sportAvatarA').onclick = ()=>renderSportPerson('A');
+document.getElementById('sportAvatarB').onclick = ()=>renderSportPerson('B');
+document.getElementById('sportBack').onclick = ()=>renderSportHome();
+
+document.getElementById('btnAddCheckin').onclick = ()=>{
+  if(!sportPerson) return;
+  openSportModal(sportPerson, null);
+};
 
 document.getElementById('sportModalCancel').onclick = ()=>{
   document.getElementById('sportModalMask').classList.remove('show');
@@ -1682,21 +1839,23 @@ document.getElementById('sportModalCancel').onclick = ()=>{
 document.getElementById('sportModalSave').onclick = async ()=>{
   const title = document.getElementById('sportTitle').value.trim();
   if(!title){ toast('请输入项目名称'); return; }
+  const p = sportPerson;
+  if(!p){ toast('出错了'); return; }
   if(editingCheckinId){
-    const item = state.checkins.find(c=>c.id===editingCheckinId);
+    const item = (state.checkins[p]||[]).find(c=>c.id===editingCheckinId);
     if(item){
       item.title = title;
       item.emoji = sportSelectedEmoji;
       item.freq = sportSelectedFreq;
     }
   } else {
-    state.checkins.push({
+    state.checkins[p].push({
       id: uid(), title, emoji: sportSelectedEmoji, freq: sportSelectedFreq
     });
   }
   await saveConfig();
   document.getElementById('sportModalMask').classList.remove('show');
-  renderCheckins();
+  renderCheckinList(p);
   toast('已保存');
 };
 
@@ -1704,19 +1863,22 @@ document.getElementById('sportModalMask').onclick = ev=>{
   if(ev.target.id==='sportModalMask') document.getElementById('sportModalMask').classList.remove('show');
 };
 
-document.getElementById('wkPrev').onclick = ()=>{ sportWeekOffset--; renderWeekStrip(); };
-document.getElementById('wkNext').onclick = ()=>{ sportWeekOffset++; renderWeekStrip(); };
+document.getElementById('homeWkPrev').onclick = ()=>{ homeWeekOffset--; renderHomeWeekStrip(); };
+document.getElementById('homeWkNext').onclick = ()=>{ homeWeekOffset++; renderHomeWeekStrip(); };
+document.getElementById('personWkPrev').onclick = ()=>{ personWeekOffset--; renderPersonWeekStrip(sportView); };
+document.getElementById('personWkNext').onclick = ()=>{ personWeekOffset++; renderPersonWeekStrip(sportView); };
 
-function deleteCheckin(id){
+function deleteCheckin(p, id){
   confirmModal('删除', '确定删除这个打卡项？', async ()=>{
-    state.checkins = state.checkins.filter(c=>c.id!==id);
-    // 清理日志中该项
-    Object.keys(state.checkinLogs).forEach(d=>{
-      state.checkinLogs[d] = state.checkinLogs[d].filter(cid=>cid!==id);
-      if(state.checkinLogs[d].length===0) delete state.checkinLogs[d];
+    state.checkins[p] = (state.checkins[p]||[]).filter(c=>c.id!==id);
+    // 清理该人日志中该项
+    const logs = state.checkinLogs[p] || {};
+    Object.keys(logs).forEach(d=>{
+      logs[d] = logs[d].filter(cid=>cid!==id);
+      if(logs[d].length===0) delete logs[d];
     });
     await saveConfig();
-    renderCheckins();
+    renderCheckinList(p);
     toast('已删除');
   });
 }
@@ -1854,7 +2016,7 @@ if('serviceWorker' in navigator){
   initCalendar();
   renderAnniversaries();
   renderCalendar();
-  renderCheckins();
+  renderSport();
   fetchRate().then(async r=>{ if(r && state.rateAuto){ state.rate=r; await saveConfig(); renderLedgerAll(); } });
   startPolling();
 })();
