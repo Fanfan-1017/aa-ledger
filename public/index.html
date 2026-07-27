@@ -238,12 +238,13 @@
   }
   .cal-nav .cal-arrow:active{background:var(--bg)}
 
-  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;text-align:center;margin-bottom:4px}
-  .cal-grid .cal-dow{font-size:11px;color:var(--text3);padding:6px 0;font-weight:500}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center;margin-bottom:4px}
+  .cal-grid .cal-dow{font-size:11px;color:var(--text3);padding:8px 0;font-weight:500}
   .cal-grid .cal-day{
-    aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
     border-radius:var(--radius-sm);cursor:pointer;font-size:14px;color:var(--text);
     position:relative;transition:all 0.12s;-webkit-tap-highlight-color:transparent;
+    padding:8px 0;min-height:40px;
   }
   .cal-grid .cal-day:hover{background:var(--bg)}
   .cal-grid .cal-day.empty{cursor:default}
@@ -252,7 +253,7 @@
   .cal-grid .cal-day.has-plan{font-weight:600}
   .cal-grid .cal-day .plan-dot{
     width:5px;height:5px;border-radius:50%;background:var(--teal);
-    position:absolute;bottom:4px;
+    position:absolute;bottom:3px;
   }
   .cal-grid .cal-day.today .plan-dot{background:var(--teal)}
   .cal-grid .cal-day.other-month{color:var(--text3)}

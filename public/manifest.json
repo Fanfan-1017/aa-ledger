@@ -3,10 +3,10 @@
   "short_name": "小窝",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#fdf2f8",
-  "theme_color": "#fdf2f8",
+  "background_color": "#eff6ff",
+  "theme_color": "#eff6ff",
   "icons": [{
-    "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='M50 85C50 85 15 55 15 35C15 18 28 10 40 10C48 10 50 16 50 16C50 16 52 10 60 10C72 10 85 18 85 35C85 55 50 85 50 85Z' fill='%23ec4899'/></svg>",
+    "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%233b82f6'/><text x='50' y='68' text-anchor='middle' fill='white' font-size='50' font-family='sans-serif'>帆</text></svg>",
     "sizes": "any",
     "type": "image/svg+xml",
     "purpose": "any maskable"
