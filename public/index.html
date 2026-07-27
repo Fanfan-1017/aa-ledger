@@ -82,10 +82,16 @@
     padding:8px 16px;border:1px solid var(--border);border-radius:20px;
     background:var(--card);cursor:pointer;font-size:13px;color:var(--text2);
     transition:all 0.12s;font-family:var(--font);white-space:nowrap;
-    -webkit-tap-highlight-color:transparent;
+    -webkit-tap-highlight-color:transparent;position:relative;
   }
   .cat-btn.active{background:var(--blue);border-color:var(--blue);color:#fff}
   .cat-btn.custom{border-style:dashed}
+  .cat-btn .del-cat{
+    display:none;width:14px;height:14px;border-radius:50%;background:var(--red);color:#fff;
+    font-size:10px;line-height:14px;text-align:center;margin-left:4px;vertical-align:middle;
+    cursor:pointer;border:none;padding:0;
+  }
+  .cat-btn:hover .del-cat{display:inline-block}
 
   .submit-row{display:flex;align-items:center;gap:8px}
   .submit-row input[type=date]{
@@ -164,9 +170,13 @@
   .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--text);color:#fff;padding:8px 18px;border-radius:20px;font-size:13px;z-index:1001;opacity:0;transition:opacity 0.2s;pointer-events:none}
   .toast.show{opacity:1}
 
-  /* 安装提示 */
   .install-banner{display:none;background:var(--blue);color:#fff;text-align:center;padding:12px 16px;font-size:14px;cursor:pointer;border-radius:var(--radius);margin-bottom:16px}
   .install-banner.show{display:block}
+
+  /* 列表折叠 */
+  .list-toggle{display:flex;align-items:center;justify-content:center;gap:6px;padding:8px;font-size:13px;color:var(--text2);cursor:pointer;-webkit-tap-highlight-color:transparent;border-top:1px dashed var(--border);margin-top:8px}
+  .list-toggle .arrow{font-size:12px;transition:transform 0.2s}
+  .list-toggle.open .arrow{transform:rotate(180deg)}
 </style>
 </head>
 <body>
@@ -175,7 +185,7 @@
   <header>
     <h1><span class="sync-dot" id="syncDot" title="同步状态"></span>AA 记账</h1>
     <div class="rate-box">
-      <span style="font-size:12px">1 JPY ≈</span>
+      <span style="font-size:12px">1 JPY </span>
       <input type="number" id="rateInput" step="0.0001" min="0.001" value="0.0482">
       <span style="font-size:12px">RMB</span>
       <span class="rate-src" id="rateSrc" title="点击切换自动/手动">auto</span>
@@ -295,11 +305,13 @@ let state = {
   rate: DEFAULT_RATE,
   rateAuto: true,
   rateUpdated: '',
+  customCats: ['吃饭','便利店','超市','家用','娱乐'],
 };
 
 let pollTimer = null;
 let polling = false;
 let lastSync = 0;
+let listExpanded = false;
 
 async function loadConfig(){
   try{
@@ -309,6 +321,7 @@ async function loadConfig(){
     if(cfg.rate) state.rate = parseFloat(cfg.rate);
     if(cfg.rateAuto) state.rateAuto = cfg.rateAuto === 'true';
     if(cfg.rateUpdated) state.rateUpdated = cfg.rateUpdated;
+    if(cfg.customCats){ try{ state.customCats = JSON.parse(cfg.customCats); }catch(e){} }
   }catch(e){ console.warn('load config', e); }
 }
 
@@ -326,6 +339,7 @@ async function saveConfig(){
     await API.setConfig('rate', state.rate);
     await API.setConfig('rateAuto', state.rateAuto);
     await API.setConfig('rateUpdated', state.rateUpdated);
+    await API.setConfig('customCats', state.customCats);
   }catch(e){ console.warn('save config', e); }
 }
 
@@ -432,20 +446,41 @@ function selectCurrency(c){
   document.getElementById('amountInput').focus();
 }
 
+function renderCatBtns(){
+  const row = document.getElementById('catRow');
+  let html = '';
+  state.customCats.forEach(cat=>{
+    html += `<button class="cat-btn${activeCategory===cat?' active':''}" data-cat="${esc(cat)}">${esc(cat)}<span class="del-cat" data-del="${esc(cat)}">×</span></button>`;
+  });
+  html += '<button class="cat-btn custom" data-cat="__custom__">+ 自定义</button>';
+  row.innerHTML = html;
+}
+
 function selectCategory(cat){
   if(cat === '__custom__'){
     const v = prompt('输入自定义分类（如：电影、奶茶）：');
-    if(v && v.trim()){ activeCategory = v.trim(); updateCatBtns(); }
+    if(v && v.trim()){
+      const name = v.trim();
+      if(!state.customCats.includes(name)){
+        state.customCats.push(name);
+        saveConfig();
+      }
+      activeCategory = name;
+      renderCatBtns();
+    }
     return;
   }
   activeCategory = activeCategory === cat ? '' : cat;
-  updateCatBtns();
+  renderCatBtns();
 }
 
-function updateCatBtns(){
-  document.querySelectorAll('.cat-btn').forEach(b=>{
-    if(b.dataset.cat !== '__custom__') b.classList.toggle('active', b.dataset.cat === activeCategory);
-  });
+function deleteCategory(cat, ev){
+  ev.stopPropagation();
+  if(!confirm(`删除"${cat}"分类？`)) return;
+  state.customCats = state.customCats.filter(c=>c!==cat);
+  if(activeCategory === cat) activeCategory = '';
+  saveConfig();
+  renderCatBtns();
 }
 
 function updateCnyPreview(){
@@ -473,7 +508,7 @@ async function submitEntry(){
     state.entries = await API.getEntries();
     document.getElementById('amountInput').value = '';
     activeCategory = '';
-    updateCatBtns();
+    renderCatBtns();
     updateCnyPreview();
     renderAll();
     toast('已记录');
@@ -525,8 +560,8 @@ function renderSettle(){
   const vb = document.getElementById('verdictBox');
   if(items.length===0){ vb.innerHTML = '<div class="verdict none">本月暂无记录</div>'; }
   else if(Math.abs(diff)<0.005){ vb.innerHTML = '<div class="verdict none">已平衡，无需转账</div>'; }
-  else if(diff>0){ vb.innerHTML = `<div class="verdict action">${nB}<span class="arrow">→</span>${nA} 转账 <strong>¥${fmtMoney(diff)}</strong> 即可抹平</div>`; }
-  else { vb.innerHTML = `<div class="verdict action">${nA}<span class="arrow">→</span>${nB} 转账 <strong>¥${fmtMoney(-diff)}</strong> 即可抹平</div>`; }
+  else if(diff>0){ vb.innerHTML = `<div class="verdict action">${nB}<span class="arrow">→</span>${nA} 转账 <strong>¥${fmtMoney(diff)} RMB</strong> 即可抹平</div>`; }
+  else { vb.innerHTML = `<div class="verdict action">${nA}<span class="arrow">→</span>${nB} 转账 <strong>¥${fmtMoney(-diff)} RMB</strong> 即可抹平</div>`; }
   const settled = !!state.settled[m];
   document.getElementById('settledTag').style.display = settled?'inline-block':'none';
   document.getElementById('btnMarkSettled').style.display = settled?'none':'inline-block';
@@ -572,13 +607,19 @@ function renderList(){
     const tA = items.filter(en=>en.payer==='A').reduce((s,en)=>s+cnyAmount(en),0);
     const tB = items.filter(en=>en.payer==='B').reduce((s,en)=>s+cnyAmount(en),0);
     const stag = state.settled[m] ? '<span class="settled-tag">已结算</span>' : '';
-    html += `<div class="month-group"><div class="month-head">${m}${stag}<span class="sub">合计 ¥${fmtMoney(tot)} RMB · ${esc(nameOf('A'))} ¥${fmtMoney(tA)} RMB · ${esc(nameOf('B'))} ¥${fmtMoney(tB)} RMB</span></div><table class="list-table"><thead><tr><th style="width:80px">日期</th><th style="width:70px">付款人</th><th style="width:80px">分类</th><th style="text-align:right">金额</th><th style="text-align:right;width:80px">折合¥</th><th style="width:40px"></th></tr></thead><tbody>`;
-    items.forEach(en=>{
+    const displayItems = listExpanded ? items : items.slice(0,5);
+    const hidden = items.length > 5 && !listExpanded;
+    html += `<div class="month-group"><div class="month-head">${m}${stag}<span class="sub">合计 ¥${fmtMoney(tot)} RMB · ${esc(nameOf('A'))} ${fmtMoney(tA)} RMB · ${esc(nameOf('B'))} ¥${fmtMoney(tB)} RMB</span></div><table class="list-table"><thead><tr><th style="width:80px">日期</th><th style="width:70px">付款人</th><th style="width:80px">分类</th><th style="text-align:right">金额</th><th style="text-align:right;width:80px">折合¥</th><th style="width:40px"></th></tr></thead><tbody>`;
+    displayItems.forEach(en=>{
       const cnyV = cnyAmount(en);
       const curLabel = en.currency==='JPY' ? '￥'+fmtMoney(en.amount,'')+' JPY' : '¥'+fmtMoney(en.amount,'')+' RMB';
       html += `<tr data-id="${en.id}"><td style="color:var(--text3);font-size:13px">${en.date.slice(5)}</td><td class="payer-cell ${en.payer==='A'?'a':'b'}">${esc(nameOf(en.payer))}</td><td><span class="cat-tag">${esc(en.category||'其他')}</span></td><td class="amt-cell" style="text-align:right">${curLabel}</td><td class="cny-cell" style="text-align:right">¥${fmtMoney(cnyV)} RMB</td><td style="text-align:center"><button data-act="del" style="border:none;background:none;color:var(--text3);cursor:pointer;font-size:16px;padding:0 4px" title="删除">×</button></td></tr>`;
     });
-    html += '</tbody></table></div>';
+    html += '</tbody></table>';
+    if(hidden || listExpanded && items.length > 5){
+      html += `<div class="list-toggle${listExpanded?' open':''}" data-month="${m}"><span>${listExpanded?'收起':'展开全部 ('+items.length+'笔)'}</span><span class="arrow">▼</span></div>`;
+    }
+    html += '</div>';
   });
   c.innerHTML = html;
   c.querySelectorAll('[data-act="del"]').forEach(btn=>{
@@ -590,6 +631,9 @@ function renderList(){
       });
     };
   });
+  c.querySelectorAll('.list-toggle').forEach(t=>{
+    t.onclick = ()=>{ listExpanded = !listExpanded; renderList(); };
+  });
 }
 
 function updateCount(){ document.getElementById('recCount').textContent = state.entries.length; }
@@ -600,6 +644,7 @@ function renderAll(){
   renderToday();
   renderSettleMonth();
   renderList();
+  renderCatBtns();
   updateCount();
 }
 
@@ -607,7 +652,17 @@ function renderAll(){
 document.getElementById('payerBtnA').onclick = ()=>selectPayer('A');
 document.getElementById('payerBtnB').onclick = ()=>selectPayer('B');
 document.querySelectorAll('.currency-btn').forEach(b=>b.onclick = ()=>selectCurrency(b.dataset.curr));
-document.getElementById('catRow').onclick = ev=>{ const btn=ev.target.closest('.cat-btn'); if(btn) selectCategory(btn.dataset.cat); };
+
+document.getElementById('catRow').onclick = ev=>{
+  const btn = ev.target.closest('.cat-btn');
+  if(!btn) return;
+  if(ev.target.classList.contains('del-cat')){
+    deleteCategory(btn.dataset.cat, ev);
+    return;
+  }
+  selectCategory(btn.dataset.cat);
+};
+
 document.getElementById('amountInput').oninput = updateCnyPreview;
 document.getElementById('amountInput').onkeydown = ev=>{ if(ev.key==='Enter') submitEntry(); };
 document.getElementById('submitBtn').onclick = submitEntry;
@@ -662,6 +717,7 @@ document.getElementById('fileImport').onchange = async ev=>{
           for(const e of d.entries){ await API.addEntry(e); }
           if(d.names){ state.names=d.names; await saveConfig(); }
           if(d.settled){ state.settled=d.settled; await saveConfig(); }
+          if(d.customCats){ state.customCats=d.customCats; await saveConfig(); }
           state.entries = await API.getEntries(); renderAll(); toast('导入成功');
         }catch(e){ toast('导入失败'); }
       });
