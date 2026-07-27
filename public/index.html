@@ -391,6 +391,7 @@
         <button class="payer-btn" id="payerBtnA">
           <span class="avatar a" id="avatarA" data-payer="A" title="点击更换头像">
             <span id="avatarTextA">👤</span>
+            <img id="avatarImgA" src="" style="display:none" alt="">
             <span class="avatar-edit">📷</span>
           </span>
           <span id="payerLabelA">帆帆</span>
@@ -398,6 +399,7 @@
         <button class="payer-btn" id="payerBtnB">
           <span class="avatar b" id="avatarB" data-payer="B" title="点击更换头像">
             <span id="avatarTextB">👤</span>
+            <img id="avatarImgB" src="" style="display:none" alt="">
             <span class="avatar-edit">📷</span>
           </span>
           <span id="payerLabelB">源源</span>
@@ -699,18 +701,21 @@ function renderPayerBtns(){
 }
 
 function renderAvatar(p){
-  const el = document.getElementById('avatar'+p);
   const textEl = document.getElementById('avatarText'+p);
-  if(!el || !textEl) return;
+  const imgEl = document.getElementById('avatarImg'+p);
+  const avatarEl = document.getElementById('avatar'+p);
+  if(!textEl || !imgEl) return;
   const url = state.avatars[p];
   if(url){
     textEl.style.display = 'none';
-    el.style.backgroundImage = `url(${url})`;
-    el.classList.add('has-img');
+    imgEl.src = url;
+    imgEl.style.display = '';
+    if(avatarEl) avatarEl.classList.add('has-img');
   } else {
     textEl.style.display = '';
-    el.style.backgroundImage = '';
-    el.classList.remove('has-img');
+    imgEl.src = '';
+    imgEl.style.display = 'none';
+    if(avatarEl) avatarEl.classList.remove('has-img');
   }
 }
 
