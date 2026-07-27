@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="AA记账">
+<meta name="theme-color" content="#f5f5f5">
+<link rel="manifest" href="/manifest.json">
+<title>AA 记账</title>
+<style>
+  :root{
+    --bg:#f5f5f5; --card:#fff; --border:#e8e8e8;
+    --text:#333; --text2:#888; --text3:#bbb;
+    --blue:#3b82f6; --blue-bg:#eff6ff; --blue-light:#dbeafe;
+    --red:#ef4444; --red-bg:#fef2f2; --green:#10b981; --green-bg:#ecfdf5;
+    --orange:#f59e0b; --orange-bg:#fffbeb;
+    --purple:#8b5cf6; --purple-bg:#f5f3ff;
+    --radius:10px; --radius-sm:6px;
+    --font:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;
+    --safe-bottom:env(safe-area-inset-bottom,0px);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:15px;line-height:1.5;padding:20px 16px calc(60px + var(--safe-bottom))}
+  .wrap{max-width:720px;margin:0 auto}
+
+  header{margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+  header h1{font-size:20px;font-weight:700}
+  header .sync-dot{width:8px;height:8px;border-radius:50%;background:var(--green);display:inline-block;margin-right:4px}
+  header .sync-dot.off{background:var(--text3)}
+  header .rate-box{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text2);background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:5px 10px}
+  header .rate-box input{width:60px;border:none;background:transparent;font-size:13px;color:var(--text);text-align:center;outline:none;font-family:var(--font)}
+  header .rate-box input:focus{border-bottom:1px solid var(--blue)}
+  header .rate-box .rate-src{font-size:11px;color:var(--text3);cursor:pointer}
+  header .rate-box .rate-src.locked{color:var(--orange)}
+
+  .today-bar{display:flex;align-items:center;gap:10px;margin-bottom:18px;font-size:13px;color:var(--text2);flex-wrap:wrap}
+  .today-bar .val{font-weight:600;color:var(--text)}
+
+  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:16px}
+
+  .quick-entry{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+  @media(max-width:420px){.quick-entry{grid-template-columns:1fr}}
+
+  .payer-btn{
+    display:flex;align-items:center;gap:8px;
+    padding:14px 16px;border:2px solid var(--border);border-radius:var(--radius);
+    background:var(--card);cursor:pointer;font-size:16px;font-weight:600;
+    color:var(--text);transition:all 0.15s;font-family:var(--font);
+    -webkit-tap-highlight-color:transparent;
+  }
+  .payer-btn:active{transform:scale(0.97)}
+  .payer-btn.active{background:var(--blue-bg);border-color:var(--blue);color:var(--blue);box-shadow:0 0 0 3px rgba(59,130,246,0.15)}
+  .payer-btn .avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+  .payer-btn .avatar.a{background:var(--blue-light);color:var(--blue)}
+  .payer-btn .avatar.b{background:var(--purple-bg);color:var(--purple)}
+
+  .entry-form{display:none}
+  .entry-form.show{display:block}
+
+  .currency-row{display:flex;gap:6px;margin-bottom:12px}
+  .currency-btn{
+    flex:1;padding:10px;border:1px solid var(--border);border-radius:var(--radius-sm);
+    background:var(--card);cursor:pointer;font-size:14px;color:var(--text2);
+    text-align:center;transition:all 0.12s;font-family:var(--font);
+    -webkit-tap-highlight-color:transparent;
+  }
+  .currency-btn.active{background:var(--blue-bg);border-color:var(--blue);color:var(--blue);font-weight:600}
+
+  .amount-row{margin-bottom:12px}
+  .amount-row input{
+    width:100%;padding:14px;border:1px solid var(--border);border-radius:var(--radius);
+    font-size:24px;font-weight:600;color:var(--text);outline:none;font-family:var(--font);
+  }
+  .amount-row input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(59,130,246,0.1)}
+  .amount-row input::placeholder{color:var(--text3);font-weight:400;font-size:18px}
+  .cny-preview{font-size:13px;color:var(--text2);margin-top:6px;display:none}
+
+  .cat-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+  .cat-btn{
+    padding:8px 16px;border:1px solid var(--border);border-radius:20px;
+    background:var(--card);cursor:pointer;font-size:13px;color:var(--text2);
+    transition:all 0.12s;font-family:var(--font);white-space:nowrap;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .cat-btn.active{background:var(--blue);border-color:var(--blue);color:#fff}
+  .cat-btn.custom{border-style:dashed}
+
+  .submit-row{display:flex;align-items:center;gap:8px}
+  .submit-row input[type=date]{
+    padding:10px;border:1px solid var(--border);border-radius:var(--radius-sm);
+    font-size:14px;color:var(--text);outline:none;font-family:var(--font);width:140px;
+  }
+  .submit-row input[type=date]:focus{border-color:var(--blue)}
+  .submit-btn{
+    flex:1;padding:12px;border:none;border-radius:var(--radius-sm);
+    background:var(--blue);color:#fff;font-size:15px;font-weight:600;
+    cursor:pointer;transition:all 0.12s;font-family:var(--font);
+    -webkit-tap-highlight-color:transparent;
+  }
+  .submit-btn:active{transform:scale(0.98)}
+  .submit-btn:disabled{opacity:0.5}
+
+  /* 结算 */
+  .settle-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+  @media(max-width:420px){.settle-grid{grid-template-columns:1fr}}
+  .settle-cell{background:var(--blue-bg);border-radius:var(--radius);padding:14px;text-align:center}
+  .settle-cell.b{background:var(--purple-bg)}
+  .settle-cell .who-name{font-weight:600;font-size:14px;color:var(--text)}
+  .settle-cell .big{font-size:22px;font-weight:700;margin:4px 0}
+  .settle-cell .big.blue{color:var(--blue)}
+  .settle-cell .big.purple{color:var(--purple)}
+  .settle-cell .sub{font-size:12px;color:var(--text3)}
+  .settle-total{text-align:center;padding:10px;background:var(--orange-bg);border-radius:var(--radius);font-size:13px;color:var(--text2);margin-bottom:12px}
+  .settle-total .num{font-weight:700;color:var(--orange);font-size:18px}
+  .verdict{text-align:center;padding:14px;border-radius:var(--radius);font-size:16px;font-weight:600}
+  .verdict.none{background:var(--card);border:1px solid var(--border);color:var(--text3)}
+  .verdict.action{background:var(--green-bg);color:var(--green);border:1px solid var(--green)}
+  .verdict .arrow{margin:0 6px}
+  .rate-info{text-align:center;font-size:12px;color:var(--text3);margin-top:8px}
+
+  .cat-summary table{width:100%;border-collapse:collapse;font-size:13px}
+  .cat-summary th{text-align:left;padding:6px 8px;color:var(--text3);font-weight:400;font-size:12px;border-bottom:1px solid var(--border)}
+  .cat-summary td{padding:8px;border-bottom:1px solid var(--border);color:var(--text2)}
+  .cat-summary td:last-child{text-align:right;color:var(--text);font-weight:600}
+  .cat-summary tr:last-child td{border-bottom:none}
+  .cat-summary .bar-wrap{width:60px;height:6px;background:var(--bg);border-radius:3px;display:inline-block;vertical-align:middle;margin-right:6px}
+  .cat-summary .bar-fill{height:100%;border-radius:3px;background:var(--blue)}
+
+  .list-table{width:100%;border-collapse:collapse;font-size:14px}
+  .list-table th{text-align:left;padding:8px 10px;color:var(--text3);font-weight:400;font-size:12px;border-bottom:1px solid var(--border)}
+  .list-table td{padding:10px;border-bottom:1px solid var(--border);vertical-align:middle}
+  .list-table tr:last-child td{border-bottom:none}
+  .list-table .cat-tag{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;background:var(--blue-bg);color:var(--blue);white-space:nowrap}
+  .list-table .payer-cell{font-weight:600}
+  .list-table .payer-cell.a{color:var(--blue)}
+  .list-table .payer-cell.b{color:var(--purple)}
+  .list-table .amt-cell{font-weight:600;white-space:nowrap}
+  .list-table .cny-cell{color:var(--text3);font-size:12px}
+
+  .month-group{margin-bottom:20px}
+  .month-head{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:600;color:var(--text);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+  .month-head .sub{font-weight:400;font-size:12px;color:var(--text3);margin-left:auto}
+  .settled-tag{font-size:11px;padding:2px 8px;border-radius:10px;background:var(--green-bg);color:var(--green);margin-left:6px}
+
+  footer{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;font-size:12px;color:var(--text3);margin-top:20px;padding-top:12px;border-top:1px solid var(--border)}
+  footer .btns{display:flex;gap:4px}
+  footer button{padding:4px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--card);color:var(--text2);font-size:12px;cursor:pointer;font-family:var(--font);transition:all 0.12s}
+  footer button:hover{border-color:var(--blue);color:var(--blue)}
+  footer button.danger:hover{border-color:var(--red);color:var(--red)}
+
+  .empty{text-align:center;padding:30px;color:var(--text3);font-size:14px}
+
+  .modal-mask{position:fixed;inset:0;background:rgba(0,0,0,0.3);display:none;align-items:center;justify-content:center;z-index:1000}
+  .modal-mask.show{display:flex}
+  .modal{background:var(--card);border-radius:var(--radius);padding:22px;max-width:380px;width:90%;box-shadow:0 8px 30px rgba(0,0,0,0.12)}
+  .modal h3{font-size:16px;margin-bottom:8px}
+  .modal p{font-size:14px;color:var(--text2);margin-bottom:16px}
+  .modal .actions{display:flex;gap:8px;justify-content:flex-end}
+  .modal button{padding:7px 16px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--card);color:var(--text);font-size:14px;cursor:pointer;font-family:var(--font)}
+  .modal button.danger{background:var(--red);border-color:var(--red);color:#fff}
+
+  .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--text);color:#fff;padding:8px 18px;border-radius:20px;font-size:13px;z-index:1001;opacity:0;transition:opacity 0.2s;pointer-events:none}
+  .toast.show{opacity:1}
+
+  /* 安装提示 */
+  .install-banner{display:none;background:var(--blue);color:#fff;text-align:center;padding:12px 16px;font-size:14px;cursor:pointer;border-radius:var(--radius);margin-bottom:16px}
+  .install-banner.show{display:block}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1><span class="sync-dot" id="syncDot" title="同步状态"></span>AA 记账</h1>
+    <div class="rate-box">
+      <span style="font-size:12px">1 JPY ≈</span>
+      <input type="number" id="rateInput" step="0.0001" min="0.001" value="0.0482">
+      <span style="font-size:12px">CNY</span>
+      <span class="rate-src" id="rateSrc" title="点击切换自动/手动">auto</span>
+    </div>
+  </header>
+
+  <div class="install-banner" id="installBanner">📱 添加到桌面，像 App 一样使用</div>
+  <div class="today-bar" id="todayBar"></div>
+
+  <section>
+    <div class="quick-entry">
+      <button class="payer-btn" id="payerBtnA">
+        <span class="avatar a">👤</span>
+        <span id="payerLabelA">小明</span>
+      </button>
+      <button class="payer-btn" id="payerBtnB">
+        <span class="avatar b">👤</span>
+        <span id="payerLabelB">小红</span>
+      </button>
+    </div>
+
+    <div class="card entry-form" id="entryForm">
+      <div class="currency-row">
+        <button class="currency-btn active" data-curr="CNY">¥ 人民币</button>
+        <button class="currency-btn" data-curr="JPY">￥ 日元</button>
+      </div>
+      <div class="amount-row">
+        <input type="number" id="amountInput" step="0.01" min="0.01" placeholder="输入金额" inputmode="decimal">
+        <div class="cny-preview" id="cnyPreview"></div>
+      </div>
+      <div class="cat-row" id="catRow">
+        <button class="cat-btn" data-cat="吃饭">吃饭</button>
+        <button class="cat-btn" data-cat="便利店">便利店</button>
+        <button class="cat-btn" data-cat="超市">超市</button>
+        <button class="cat-btn" data-cat="家用">家用</button>
+        <button class="cat-btn" data-cat="娱乐">娱乐</button>
+        <button class="cat-btn custom" data-cat="__custom__">+ 自定义</button>
+      </div>
+      <div class="submit-row">
+        <input type="date" id="dateInput">
+        <button class="submit-btn" id="submitBtn">记一笔</button>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+        <span style="font-weight:600;font-size:15px">月度结算</span>
+        <select id="settleMonth" style="padding:5px 8px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:var(--font);color:var(--text);outline:none"></select>
+        <span id="settledTag" class="settled-tag" style="display:none">已结算</span>
+        <button id="btnMarkSettled" style="margin-left:auto;padding:4px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--card);font-size:12px;color:var(--text2);cursor:pointer;font-family:var(--font)">标记已结算</button>
+        <button id="btnUnmarkSettled" style="margin-left:auto;padding:4px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--card);font-size:12px;color:var(--text2);cursor:pointer;font-family:var(--font);display:none">取消结算</button>
+      </div>
+      <div class="settle-grid" id="settleGrid"></div>
+      <div class="settle-total" id="settleTotal"></div>
+      <div id="verdictBox"></div>
+      <div class="rate-info" id="rateInfo"></div>
+
+      <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border)">
+        <div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:8px">分类统计</div>
+        <div class="cat-summary" id="catSummary"></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div style="font-weight:600;font-size:15px;margin-bottom:10px">记录</div>
+    <div class="card">
+      <div class="empty" id="emptyHint">还没有记录，点上方按钮开始记账</div>
+      <div id="listContainer"></div>
+    </div>
+  </section>
+
+  <footer>
+    <span id="statusLine">共 <span id="recCount">0</span> 条记录 · 云端同步</span>
+    <span class="btns">
+      <button id="btnExport">导出</button>
+      <button id="btnImport">导入</button>
+      <button class="danger" id="btnClear">清空</button>
+      <input type="file" id="fileImport" accept=".json" style="display:none">
+    </span>
+  </footer>
+</div>
+
+<div class="modal-mask" id="modalMask">
+  <div class="modal">
+    <h3 id="modalTitle"></h3>
+    <p id="modalText"></p>
+    <div class="actions">
+      <button id="modalCancel">取消</button>
+      <button class="danger" id="modalConfirm">确认</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ===== API 层 ===== */
+const API = {
+  async getEntries(){ const r=await fetch('/api/entries'); return r.json(); },
+  async addEntry(e){ await fetch('/api/entries',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(e)}); },
+  async delEntry(id){ await fetch('/api/entries',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({id})}); },
+  async getConfig(){ const r=await fetch('/api/config'); return r.json(); },
+  async setConfig(key,value){ await fetch('/api/config',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({key,value:JSON.stringify(value)})}); },
+};
+
+/* ===== 数据层 ===== */
+const DEFAULT_RATE = 0.0482;
+let state = {
+  names: {A:'小明', B:'小红'},
+  entries: [],
+  settled: {},
+  rate: DEFAULT_RATE,
+  rateAuto: true,
+  rateUpdated: '',
+};
+
+let pollTimer = null;
+let polling = false;
+let lastSync = 0;
+
+async function loadConfig(){
+  try{
+    const cfg = await API.getConfig();
+    if(cfg.names){ try{ state.names = JSON.parse(cfg.names); }catch(e){} }
+    if(cfg.settled){ try{ state.settled = JSON.parse(cfg.settled); }catch(e){} }
+    if(cfg.rate) state.rate = parseFloat(cfg.rate);
+    if(cfg.rateAuto) state.rateAuto = cfg.rateAuto === 'true';
+    if(cfg.rateUpdated) state.rateUpdated = cfg.rateUpdated;
+  }catch(e){ console.warn('load config', e); }
+}
+
+async function loadEntries(){
+  try{
+    state.entries = await API.getEntries();
+    lastSync = Date.now();
+  }catch(e){ console.warn('load entries', e); }
+}
+
+async function saveConfig(){
+  try{
+    await API.setConfig('names', state.names);
+    await API.setConfig('settled', state.settled);
+    await API.setConfig('rate', state.rate);
+    await API.setConfig('rateAuto', state.rateAuto);
+    await API.setConfig('rateUpdated', state.rateUpdated);
+  }catch(e){ console.warn('save config', e); }
+}
+
+function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
+function todayStr(){
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function monthOf(s){ return s.slice(0,7); }
+function fmtMoney(n, sym){ return (sym||'') + n.toLocaleString('zh-CN',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function nameOf(p){ return state.names[p]||p; }
+function cnyAmount(e){ return e.currency==='CNY' ? e.amount : e.amount * state.rate; }
+
+/* ===== 轮询同步 ===== */
+async function poll(){
+  if(polling) return;
+  polling = true;
+  try{
+    const fresh = await API.getEntries();
+    const oldIds = new Set(state.entries.map(e=>e.id));
+    const newIds = new Set(fresh.map(e=>e.id));
+    if(oldIds.size !== newIds.size || [...oldIds].some(id=>!newIds.has(id)) || [...newIds].some(id=>!oldIds.has(id))){
+      state.entries = fresh;
+      lastSync = Date.now();
+      renderList();
+      renderSettleMonth();
+      renderToday();
+      updateCount();
+    }
+    document.getElementById('syncDot').classList.remove('off');
+  }catch(e){
+    document.getElementById('syncDot').classList.add('off');
+  }
+  polling = false;
+}
+
+function startPolling(){
+  poll();
+  pollTimer = setInterval(poll, 5000);
+}
+
+/* ===== 汇率 ===== */
+async function fetchRate(){
+  try{
+    const res = await fetch('https://open.er-api.com/v6/latest/JPY');
+    const d = await res.json();
+    if(d && d.rates && d.rates.CNY){
+      const r = parseFloat(d.rates.CNY.toFixed(4));
+      if(r > 0.001 && r < 1){
+        if(state.rateAuto){
+          state.rate = r;
+          state.rateUpdated = todayStr();
+          saveConfig();
+        }
+        return r;
+      }
+    }
+  }catch(e){}
+  return null;
+}
+
+function renderRate(){
+  document.getElementById('rateInput').value = state.rate.toFixed(4);
+  const src = document.getElementById('rateSrc');
+  if(state.rateAuto){
+    src.textContent = 'auto'; src.className = 'rate-src'; src.title = '自动获取 · 点击锁定';
+  } else {
+    src.textContent = 'locked'; src.className = 'rate-src locked'; src.title = '已锁定 · 点击恢复自动';
+  }
+  document.getElementById('rateInfo').textContent =
+    `汇率: 1 JPY = ¥${state.rate.toFixed(4)} · ${state.rateAuto ? '自动获取' : '手动锁定'}${state.rateUpdated ? ' · '+state.rateUpdated : ''}`;
+}
+
+/* ===== 快捷记账 ===== */
+let activePayer = null;
+let activeCurrency = 'CNY';
+let activeCategory = '';
+
+function renderPayerBtns(){
+  document.getElementById('payerLabelA').textContent = esc(nameOf('A'));
+  document.getElementById('payerLabelB').textContent = esc(nameOf('B'));
+}
+
+function selectPayer(p){
+  if(activePayer === p){
+    activePayer = null;
+    document.getElementById('entryForm').classList.remove('show');
+    document.getElementById('payerBtnA').classList.remove('active');
+    document.getElementById('payerBtnB').classList.remove('active');
+    return;
+  }
+  activePayer = p;
+  document.getElementById('entryForm').classList.add('show');
+  document.getElementById('payerBtnA').classList.toggle('active', p==='A');
+  document.getElementById('payerBtnB').classList.toggle('active', p==='B');
+  document.getElementById('amountInput').focus();
+}
+
+function selectCurrency(c){
+  activeCurrency = c;
+  document.querySelectorAll('.currency-btn').forEach(b=>b.classList.toggle('active', b.dataset.curr===c));
+  updateCnyPreview();
+  document.getElementById('amountInput').focus();
+}
+
+function selectCategory(cat){
+  if(cat === '__custom__'){
+    const v = prompt('输入自定义分类（如：电影、奶茶）：');
+    if(v && v.trim()){ activeCategory = v.trim(); updateCatBtns(); }
+    return;
+  }
+  activeCategory = activeCategory === cat ? '' : cat;
+  updateCatBtns();
+}
+
+function updateCatBtns(){
+  document.querySelectorAll('.cat-btn').forEach(b=>{
+    if(b.dataset.cat !== '__custom__') b.classList.toggle('active', b.dataset.cat === activeCategory);
+  });
+}
+
+function updateCnyPreview(){
+  const el = document.getElementById('cnyPreview');
+  const amt = parseFloat(document.getElementById('amountInput').value) || 0;
+  if(activeCurrency === 'JPY' && amt > 0){
+    el.style.display = 'block';
+    el.textContent = `≈ ¥${fmtMoney(amt * state.rate)}`;
+  } else { el.style.display = 'none'; }
+}
+
+async function submitEntry(){
+  const amt = parseFloat(document.getElementById('amountInput').value);
+  if(!(amt > 0)){ toast('请输入金额'); return; }
+  if(!activePayer){ toast('请先选择付款人'); return; }
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  const date = document.getElementById('dateInput').value || todayStr();
+  const amount_cny = activeCurrency === 'CNY' ? amt : amt * state.rate;
+  try{
+    await API.addEntry({
+      id: uid(), amount: amt, currency: activeCurrency, amount_cny,
+      payer: activePayer, date, category: activeCategory || '其他', note: ''
+    });
+    state.entries = await API.getEntries();
+    document.getElementById('amountInput').value = '';
+    activeCategory = '';
+    updateCatBtns();
+    updateCnyPreview();
+    renderAll();
+    toast('已记录');
+  }catch(e){ toast('记录失败'); }
+  btn.disabled = false;
+}
+
+/* ===== 今日累计 ===== */
+function renderToday(){
+  const today = todayStr();
+  const items = state.entries.filter(e=>e.date===today);
+  if(items.length===0){ document.getElementById('todayBar').innerHTML = ''; return; }
+  const tA = items.filter(e=>e.payer==='A').reduce((s,e)=>s+cnyAmount(e),0);
+  const tB = items.filter(e=>e.payer==='B').reduce((s,e)=>s+cnyAmount(e),0);
+  document.getElementById('todayBar').innerHTML =
+    `今日 <span class="val">¥${fmtMoney(tA+tB)}</span>（${esc(nameOf('A'))} ¥${fmtMoney(tA)} + ${esc(nameOf('B'))} ¥${fmtMoney(tB)}）`;
+}
+
+/* ===== 结算 ===== */
+function renderSettleMonth(){
+  const sel = document.getElementById('settleMonth');
+  const months = new Set(state.entries.map(e=>monthOf(e.date)));
+  months.add(todayStr().slice(0,7));
+  const arr = [...months].sort((a,b)=>b.localeCompare(a));
+  const cur = sel.value || arr[0];
+  sel.innerHTML = arr.map(m=>`<option value="${m}">${m}</option>`).join('');
+  sel.value = arr.includes(cur) ? cur : arr[0];
+  renderSettle();
+}
+
+function renderSettle(){
+  const m = document.getElementById('settleMonth').value;
+  if(!m) return;
+  const items = state.entries.filter(e=>monthOf(e.date)===m);
+  const cnyA = items.filter(e=>e.payer==='A'&&e.currency==='CNY').reduce((s,e)=>s+e.amount,0);
+  const jpyA = items.filter(e=>e.payer==='A'&&e.currency==='JPY').reduce((s,e)=>s+e.amount,0);
+  const cnyB = items.filter(e=>e.payer==='B'&&e.currency==='CNY').reduce((s,e)=>s+e.amount,0);
+  const jpyB = items.filter(e=>e.payer==='B'&&e.currency==='JPY').reduce((s,e)=>s+e.amount,0);
+  const totalA = cnyA + jpyA * state.rate;
+  const totalB = cnyB + jpyB * state.rate;
+  const total = totalA + totalB;
+  const half = total / 2;
+  const diff = (totalA - totalB) / 2;
+  const nA = esc(nameOf('A')), nB = esc(nameOf('B'));
+  document.getElementById('settleGrid').innerHTML = `
+    <div class="settle-cell"><div class="who-name">${nA}</div><div class="big blue">¥${fmtMoney(totalA)}</div><div class="sub">¥${fmtMoney(cnyA)}${jpyA>0?' + ￥'+fmtMoney(jpyA,''):''}</div></div>
+    <div class="settle-cell b"><div class="who-name">${nB}</div><div class="big purple">¥${fmtMoney(totalB)}</div><div class="sub">¥${fmtMoney(cnyB)}${jpyB>0?' + ￥'+fmtMoney(jpyB,''):''}</div></div>`;
+  document.getElementById('settleTotal').innerHTML = `共同消费折合 <span class="num">¥${fmtMoney(total)}</span> · 各应承担 ¥${fmtMoney(half)}`;
+  const vb = document.getElementById('verdictBox');
+  if(items.length===0){ vb.innerHTML = '<div class="verdict none">本月暂无记录</div>'; }
+  else if(Math.abs(diff)<0.005){ vb.innerHTML = '<div class="verdict none">已平衡，无需转账</div>'; }
+  else if(diff>0){ vb.innerHTML = `<div class="verdict action">${nB}<span class="arrow">→</span>${nA} 转账 <strong>¥${fmtMoney(diff)}</strong> 即可抹平</div>`; }
+  else { vb.innerHTML = `<div class="verdict action">${nA}<span class="arrow">→</span>${nB} 转账 <strong>¥${fmtMoney(-diff)}</strong> 即可抹平</div>`; }
+  const settled = !!state.settled[m];
+  document.getElementById('settledTag').style.display = settled?'inline-block':'none';
+  document.getElementById('btnMarkSettled').style.display = settled?'none':'inline-block';
+  document.getElementById('btnUnmarkSettled').style.display = settled?'inline-block':'none';
+  renderCatSummary(items);
+}
+
+function renderCatSummary(items){
+  if(items.length===0){ document.getElementById('catSummary').innerHTML=''; return; }
+  const map = {};
+  items.forEach(e=>{
+    const cat = e.category||'其他';
+    if(!map[cat]) map[cat] = {cnt:0, cny:0, jpyCny:0};
+    map[cat].cnt++;
+    if(e.currency==='CNY') map[cat].cny += e.amount;
+    else map[cat].jpyCny += e.amount * state.rate;
+  });
+  const cats = Object.entries(map).sort((a,b)=>(b[1].cny+b[1].jpyCny)-(a[1].cny+a[1].jpyCny));
+  const maxVal = Math.max(...cats.map(([,v])=>v.cny+v.jpyCny), 1);
+  let html = '<table><thead><tr><th>分类</th><th>笔数</th><th>CNY</th><th>JPY折¥</th><th style="text-align:right">合计</th></tr></thead><tbody>';
+  cats.forEach(([cat,v])=>{
+    const pct = Math.max((v.cny+v.jpyCny)/maxVal*100, 2);
+    html += `<tr><td>${esc(cat)}</td><td>${v.cnt}</td><td>¥${fmtMoney(v.cny)}</td><td>¥${fmtMoney(v.jpyCny)}</td><td style="text-align:right;font-weight:600"><span class="bar-wrap"><span class="bar-fill" style="width:${pct}%"></span></span>¥${fmtMoney(v.cny+v.jpyCny)}</td></tr>`;
+  });
+  html += '</tbody></table>';
+  document.getElementById('catSummary').innerHTML = html;
+}
+
+/* ===== 列表 ===== */
+function renderList(){
+  const c = document.getElementById('listContainer');
+  const e = document.getElementById('emptyHint');
+  if(state.entries.length===0){ e.style.display='block'; c.innerHTML=''; return; }
+  e.style.display='none';
+  const sorted = [...state.entries].sort((a,b)=>b.date.localeCompare(a.date)||b.id.localeCompare(a.id));
+  const groups = {};
+  sorted.forEach(en=>{ const m=monthOf(en.date); (groups[m]=groups[m]||[]).push(en); });
+  const months = Object.keys(groups).sort((a,b)=>b.localeCompare(a));
+  let html = '';
+  months.forEach(m=>{
+    const items = groups[m];
+    const tot = items.reduce((s,en)=>s+cnyAmount(en),0);
+    const tA = items.filter(en=>en.payer==='A').reduce((s,en)=>s+cnyAmount(en),0);
+    const tB = items.filter(en=>en.payer==='B').reduce((s,en)=>s+cnyAmount(en),0);
+    const stag = state.settled[m] ? '<span class="settled-tag">已结算</span>' : '';
+    html += `<div class="month-group"><div class="month-head">${m}${stag}<span class="sub">合计 ¥${fmtMoney(tot)} · ${esc(nameOf('A'))} ¥${fmtMoney(tA)} · ${esc(nameOf('B'))} ¥${fmtMoney(tB)}</span></div><table class="list-table"><thead><tr><th style="width:80px">日期</th><th style="width:70px">付款人</th><th style="width:80px">分类</th><th style="text-align:right">金额</th><th style="text-align:right;width:80px">折合¥</th><th style="width:40px"></th></tr></thead><tbody>`;
+    items.forEach(en=>{
+      const cnyV = cnyAmount(en);
+      const curSym = en.currency==='JPY'?'￥':'¥';
+      html += `<tr data-id="${en.id}"><td style="color:var(--text3);font-size:13px">${en.date.slice(5)}</td><td class="payer-cell ${en.payer==='A'?'a':'b'}">${esc(nameOf(en.payer))}</td><td><span class="cat-tag">${esc(en.category||'其他')}</span></td><td class="amt-cell" style="text-align:right">${curSym}${fmtMoney(en.amount,'')}</td><td class="cny-cell" style="text-align:right">¥${fmtMoney(cnyV)}</td><td style="text-align:center"><button data-act="del" style="border:none;background:none;color:var(--text3);cursor:pointer;font-size:16px;padding:0 4px" title="删除">×</button></td></tr>`;
+    });
+    html += '</tbody></table></div>';
+  });
+  c.innerHTML = html;
+  c.querySelectorAll('[data-act="del"]').forEach(btn=>{
+    btn.onclick = async ev=>{
+      const id = ev.target.closest('tr').dataset.id;
+      confirmModal('删除', '确定删除这条记录？', async ()=>{
+        try{ await API.delEntry(id); state.entries = await API.getEntries(); renderAll(); toast('已删除'); }
+        catch(e){ toast('删除失败'); }
+      });
+    };
+  });
+}
+
+function updateCount(){ document.getElementById('recCount').textContent = state.entries.length; }
+
+function renderAll(){
+  renderPayerBtns();
+  renderRate();
+  renderToday();
+  renderSettleMonth();
+  renderList();
+  updateCount();
+}
+
+/* ===== 事件 ===== */
+document.getElementById('payerBtnA').onclick = ()=>selectPayer('A');
+document.getElementById('payerBtnB').onclick = ()=>selectPayer('B');
+document.querySelectorAll('.currency-btn').forEach(b=>b.onclick = ()=>selectCurrency(b.dataset.curr));
+document.getElementById('catRow').onclick = ev=>{ const btn=ev.target.closest('.cat-btn'); if(btn) selectCategory(btn.dataset.cat); };
+document.getElementById('amountInput').oninput = updateCnyPreview;
+document.getElementById('amountInput').onkeydown = ev=>{ if(ev.key==='Enter') submitEntry(); };
+document.getElementById('submitBtn').onclick = submitEntry;
+
+document.getElementById('rateInput').oninput = async function(){
+  const v=parseFloat(this.value);
+  if(v>0.001 && v<1){ state.rate=v; state.rateAuto=false; await saveConfig(); renderAll(); }
+};
+document.getElementById('rateSrc').onclick = async function(){
+  if(state.rateAuto){ state.rateAuto=false; await saveConfig(); renderRate(); }
+  else { state.rateAuto=true; const r=await fetchRate(); if(r){ state.rate=r; await saveConfig(); renderAll(); } else toast('获取汇率失败'); }
+};
+
+document.getElementById('settleMonth').onchange = renderSettle;
+document.getElementById('btnMarkSettled').onclick = async ()=>{
+  const m=document.getElementById('settleMonth').value;
+  state.settled[m]=true; await saveConfig(); renderSettle(); renderList();
+};
+document.getElementById('btnUnmarkSettled').onclick = async ()=>{
+  const m=document.getElementById('settleMonth').value;
+  delete state.settled[m]; await saveConfig(); renderSettle(); renderList();
+};
+
+document.getElementById('btnExport').onclick = ()=>{
+  const blob = new Blob([JSON.stringify(state,null,2)],{type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download=`aa_ledger_${todayStr()}.json`; a.click(); URL.revokeObjectURL(a.href);
+  toast('已导出');
+};
+document.getElementById('btnImport').onclick = ()=>document.getElementById('fileImport').click();
+document.getElementById('fileImport').onchange = async ev=>{
+  const f=ev.target.files[0]; if(!f) return;
+  const r=new FileReader(); r.onload=async ()=>{
+    try{
+      const d=JSON.parse(r.result);
+      if(!d||!Array.isArray(d.entries)) throw new Error('格式错误');
+      confirmModal('导入数据',`将导入 ${d.entries.length} 条记录，会覆盖当前数据。`,async ()=>{
+        try{
+          for(const e of d.entries){ await API.addEntry(e); }
+          if(d.names){ state.names=d.names; await saveConfig(); }
+          if(d.settled){ state.settled=d.settled; await saveConfig(); }
+          state.entries = await API.getEntries(); renderAll(); toast('导入成功');
+        }catch(e){ toast('导入失败'); }
+      });
+    }catch(err){ toast('导入失败: '+err.message); }
+    ev.target.value='';
+  };
+  r.readAsText(f);
+};
+document.getElementById('btnClear').onclick = ()=>{
+  if(state.entries.length===0){ toast('没有数据'); return; }
+  confirmModal('清空','将删除全部数据，不可撤销。',async ()=>{
+    try{
+      for(const e of state.entries){ await API.delEntry(e.id); }
+      state.entries=[]; state.settled={}; await saveConfig(); renderAll(); toast('已清空');
+    }catch(e){ toast('清空失败'); }
+  });
+};
+
+// 弹窗
+let modalCb=null;
+function confirmModal(t,text,cb){
+  document.getElementById('modalTitle').textContent=t;
+  document.getElementById('modalText').textContent=text;
+  modalCb=cb; document.getElementById('modalMask').classList.add('show');
+}
+document.getElementById('modalCancel').onclick=()=>{document.getElementById('modalMask').classList.remove('show');modalCb=null;};
+document.getElementById('modalConfirm').onclick=()=>{document.getElementById('modalMask').classList.remove('show');if(modalCb){const cb=modalCb;modalCb=null;cb();}};
+document.getElementById('modalMask').onclick=ev=>{if(ev.target.id==='modalMask'){document.getElementById('modalMask').classList.remove('show');modalCb=null;}};
+
+let toastT=null;
+function toast(msg){
+  const el=document.getElementById('toast'); el.textContent=msg; el.classList.add('show');
+  clearTimeout(toastT); toastT=setTimeout(()=>el.classList.remove('show'),1800);
+}
+
+/* PWA 安装 */
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt',e=>{
+  e.preventDefault(); deferredPrompt=e;
+  document.getElementById('installBanner').classList.add('show');
+});
+document.getElementById('installBanner').onclick=()=>{
+  if(deferredPrompt){ deferredPrompt.prompt(); deferredPrompt.userChoice.then(()=>{document.getElementById('installBanner').classList.remove('show');}); }
+};
+
+// Service Worker
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('/sw.js');
+}
+
+/* ===== 启动 ===== */
+(async function init(){
+  document.getElementById('dateInput').value = todayStr();
+  await loadConfig();
+  await loadEntries();
+  document.getElementById('rateInput').value = state.rate.toFixed(4);
+  renderAll();
+  fetchRate().then(async r=>{ if(r && state.rateAuto){ state.rate=r; await saveConfig(); renderAll(); } });
+  startPolling();
+})();
+</script>
+</body>
+</html>

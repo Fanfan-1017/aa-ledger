@@ -1,0 +1,11 @@
+{
+  "name": "aa-ledger",
+  "version": "3.0.0",
+  "private": true,
+  "scripts": {
+    "setup": "node api/setup.js"
+  },
+  "dependencies": {
+    "@vercel/postgres": "^0.10.0"
+  }
+}
