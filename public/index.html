@@ -236,8 +236,11 @@
       <div class="rate-info" id="rateInfo"></div>
 
       <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border)">
-        <div style="font-size:13px;font-weight:600;color:var(--text2);margin-bottom:8px">分类统计</div>
-        <div class="cat-summary" id="catSummary"></div>
+        <div id="catSummaryToggle" style="font-size:13px;font-weight:600;color:var(--text2);display:flex;align-items:center;justify-content:space-between;cursor:pointer;-webkit-tap-highlight-color:transparent">
+          <span>分类统计</span>
+          <span id="catSummaryArrow" style="font-size:16px;transition:transform 0.2s">▸</span>
+        </div>
+        <div class="cat-summary" id="catSummary" style="display:none;margin-top:8px"></div>
       </div>
     </div>
   </section>
@@ -486,7 +489,7 @@ function renderToday(){
   const tA = items.filter(e=>e.payer==='A').reduce((s,e)=>s+cnyAmount(e),0);
   const tB = items.filter(e=>e.payer==='B').reduce((s,e)=>s+cnyAmount(e),0);
   document.getElementById('todayBar').innerHTML =
-    `今日 <span class="val">¥${fmtMoney(tA+tB)}</span>（${esc(nameOf('A'))} ¥${fmtMoney(tA)} + ${esc(nameOf('B'))} ¥${fmtMoney(tB)}）`;
+    `今日 <span class="val">¥${fmtMoney(tA+tB)} RMB</span>（${esc(nameOf('A'))} ¥${fmtMoney(tA)} RMB + ${esc(nameOf('B'))} ¥${fmtMoney(tB)} RMB）`;
 }
 
 /* ===== 结算 ===== */
@@ -518,7 +521,7 @@ function renderSettle(){
   document.getElementById('settleGrid').innerHTML = `
     <div class="settle-cell"><div class="who-name">${nA}</div><div class="big blue">¥${fmtMoney(totalA)}</div><div class="sub">RMB ¥${fmtMoney(cnyA)}${jpyA>0?' + 日元 ￥'+fmtMoney(jpyA,''):''}</div></div>
     <div class="settle-cell b"><div class="who-name">${nB}</div><div class="big purple">¥${fmtMoney(totalB)}</div><div class="sub">RMB ¥${fmtMoney(cnyB)}${jpyB>0?' + 日元 ￥'+fmtMoney(jpyB,''):''}</div></div>`;
-  document.getElementById('settleTotal').innerHTML = `共同消费折合 <span class="num">¥${fmtMoney(total)}</span> · 各应承担 ¥${fmtMoney(half)}`;
+  document.getElementById('settleTotal').innerHTML = `共同消费折合 <span class="num">¥${fmtMoney(total)} RMB</span> · 各应承担 ¥${fmtMoney(half)} RMB`;
   const vb = document.getElementById('verdictBox');
   if(items.length===0){ vb.innerHTML = '<div class="verdict none">本月暂无记录</div>'; }
   else if(Math.abs(diff)<0.005){ vb.innerHTML = '<div class="verdict none">已平衡，无需转账</div>'; }
@@ -546,7 +549,7 @@ function renderCatSummary(items){
   let html = '<table><thead><tr><th>分类</th><th>笔数</th><th>RMB</th><th>日元折¥</th><th style="text-align:right">合计</th></tr></thead><tbody>';
   cats.forEach(([cat,v])=>{
     const pct = Math.max((v.cny+v.jpyCny)/maxVal*100, 2);
-    html += `<tr><td>${esc(cat)}</td><td>${v.cnt}</td><td>¥${fmtMoney(v.cny)}</td><td>¥${fmtMoney(v.jpyCny)}</td><td style="text-align:right;font-weight:600"><span class="bar-wrap"><span class="bar-fill" style="width:${pct}%"></span></span>¥${fmtMoney(v.cny+v.jpyCny)}</td></tr>`;
+    html += `<tr><td>${esc(cat)}</td><td>${v.cnt}</td><td>¥${fmtMoney(v.cny)} RMB</td><td>¥${fmtMoney(v.jpyCny)}</td><td style="text-align:right;font-weight:600"><span class="bar-wrap"><span class="bar-fill" style="width:${pct}%"></span></span>¥${fmtMoney(v.cny+v.jpyCny)}</td></tr>`;
   });
   html += '</tbody></table>';
   document.getElementById('catSummary').innerHTML = html;
@@ -569,11 +572,11 @@ function renderList(){
     const tA = items.filter(en=>en.payer==='A').reduce((s,en)=>s+cnyAmount(en),0);
     const tB = items.filter(en=>en.payer==='B').reduce((s,en)=>s+cnyAmount(en),0);
     const stag = state.settled[m] ? '<span class="settled-tag">已结算</span>' : '';
-    html += `<div class="month-group"><div class="month-head">${m}${stag}<span class="sub">合计 ¥${fmtMoney(tot)} · ${esc(nameOf('A'))} ¥${fmtMoney(tA)} · ${esc(nameOf('B'))} ¥${fmtMoney(tB)}</span></div><table class="list-table"><thead><tr><th style="width:80px">日期</th><th style="width:70px">付款人</th><th style="width:80px">分类</th><th style="text-align:right">金额</th><th style="text-align:right;width:80px">折合¥</th><th style="width:40px"></th></tr></thead><tbody>`;
+    html += `<div class="month-group"><div class="month-head">${m}${stag}<span class="sub">合计 ¥${fmtMoney(tot)} RMB · ${esc(nameOf('A'))} ¥${fmtMoney(tA)} RMB · ${esc(nameOf('B'))} ¥${fmtMoney(tB)} RMB</span></div><table class="list-table"><thead><tr><th style="width:80px">日期</th><th style="width:70px">付款人</th><th style="width:80px">分类</th><th style="text-align:right">金额</th><th style="text-align:right;width:80px">折合¥</th><th style="width:40px"></th></tr></thead><tbody>`;
     items.forEach(en=>{
       const cnyV = cnyAmount(en);
-      const curLabel = en.currency==='JPY' ? '￥'+fmtMoney(en.amount,'')+' 日元' : '¥'+fmtMoney(en.amount,'')+' RMB';
-      html += `<tr data-id="${en.id}"><td style="color:var(--text3);font-size:13px">${en.date.slice(5)}</td><td class="payer-cell ${en.payer==='A'?'a':'b'}">${esc(nameOf(en.payer))}</td><td><span class="cat-tag">${esc(en.category||'其他')}</span></td><td class="amt-cell" style="text-align:right">${curLabel}</td><td class="cny-cell" style="text-align:right">¥${fmtMoney(cnyV)}</td><td style="text-align:center"><button data-act="del" style="border:none;background:none;color:var(--text3);cursor:pointer;font-size:16px;padding:0 4px" title="删除">×</button></td></tr>`;
+      const curLabel = en.currency==='JPY' ? '￥'+fmtMoney(en.amount,'')+' JPY' : '¥'+fmtMoney(en.amount,'')+' RMB';
+      html += `<tr data-id="${en.id}"><td style="color:var(--text3);font-size:13px">${en.date.slice(5)}</td><td class="payer-cell ${en.payer==='A'?'a':'b'}">${esc(nameOf(en.payer))}</td><td><span class="cat-tag">${esc(en.category||'其他')}</span></td><td class="amt-cell" style="text-align:right">${curLabel}</td><td class="cny-cell" style="text-align:right">¥${fmtMoney(cnyV)} RMB</td><td style="text-align:center"><button data-act="del" style="border:none;background:none;color:var(--text3);cursor:pointer;font-size:16px;padding:0 4px" title="删除">×</button></td></tr>`;
     });
     html += '</tbody></table></div>';
   });
@@ -626,6 +629,19 @@ document.getElementById('btnMarkSettled').onclick = async ()=>{
 document.getElementById('btnUnmarkSettled').onclick = async ()=>{
   const m=document.getElementById('settleMonth').value;
   delete state.settled[m]; await saveConfig(); renderSettle(); renderList();
+};
+
+// 分类统计折叠
+document.getElementById('catSummaryToggle').onclick = ()=>{
+  const el = document.getElementById('catSummary');
+  const arrow = document.getElementById('catSummaryArrow');
+  if(el.style.display === 'none'){
+    el.style.display = 'block';
+    arrow.style.transform = 'rotate(90deg)';
+  } else {
+    el.style.display = 'none';
+    arrow.style.transform = 'rotate(0deg)';
+  }
 };
 
 document.getElementById('btnExport').onclick = ()=>{
