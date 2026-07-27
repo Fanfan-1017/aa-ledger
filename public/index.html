@@ -78,9 +78,12 @@
   }
   .payer-btn:active{transform:scale(0.97)}
   .payer-btn.active{background:var(--blue-bg);border-color:var(--blue);color:var(--blue);box-shadow:0 0 0 3px rgba(59,130,246,0.15)}
-  .payer-btn .avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+  .payer-btn .avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;overflow:hidden;background-size:cover;background-position:center;cursor:pointer;position:relative}
   .payer-btn .avatar.a{background:var(--blue-light);color:var(--blue)}
   .payer-btn .avatar.b{background:var(--purple-bg);color:var(--purple)}
+  .payer-btn .avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+  .payer-btn .avatar .avatar-edit{position:absolute;inset:0;background:rgba(0,0,0,0.3);border-radius:50%;display:none;align-items:center;justify-content:center;font-size:12px;color:#fff}
+  .payer-btn .avatar:hover .avatar-edit{display:flex}
 
   .entry-form{display:none}
   .entry-form.show{display:block}
@@ -386,11 +389,17 @@
     <section>
       <div class="quick-entry">
         <button class="payer-btn" id="payerBtnA">
-          <span class="avatar a">👤</span>
+          <span class="avatar a" id="avatarA" data-payer="A" title="点击更换头像">
+            <span id="avatarTextA">👤</span>
+            <span class="avatar-edit">📷</span>
+          </span>
           <span id="payerLabelA">帆帆</span>
         </button>
         <button class="payer-btn" id="payerBtnB">
-          <span class="avatar b">👤</span>
+          <span class="avatar b" id="avatarB" data-payer="B" title="点击更换头像">
+            <span id="avatarTextB">👤</span>
+            <span class="avatar-edit">📷</span>
+          </span>
           <span id="payerLabelB">源源</span>
         </button>
       </div>
@@ -515,6 +524,7 @@ const API = {
 const DEFAULT_RATE = 0.0482;
 let state = {
   names: {A:'帆帆', B:'源源'},
+  avatars: {},
   entries: [],
   settled: {},
   rate: DEFAULT_RATE,
@@ -534,6 +544,7 @@ async function loadConfig(){
   try{
     const cfg = await API.getConfig();
     if(cfg.names){ try{ state.names = JSON.parse(cfg.names); }catch(e){} }
+    if(cfg.avatars){ try{ state.avatars = JSON.parse(cfg.avatars); }catch(e){} }
     if(cfg.settled){ try{ state.settled = JSON.parse(cfg.settled); }catch(e){} }
     if(cfg.rate) state.rate = parseFloat(cfg.rate);
     if(cfg.rateAuto) state.rateAuto = cfg.rateAuto === 'true';
@@ -554,6 +565,7 @@ async function loadEntries(){
 async function saveConfig(){
   try{
     await API.setConfig('names', state.names);
+    await API.setConfig('avatars', state.avatars);
     await API.setConfig('settled', state.settled);
     await API.setConfig('rate', state.rate);
     await API.setConfig('rateAuto', state.rateAuto);
@@ -682,6 +694,45 @@ let activeCategory = '';
 function renderPayerBtns(){
   document.getElementById('payerLabelA').textContent = esc(nameOf('A'));
   document.getElementById('payerLabelB').textContent = esc(nameOf('B'));
+  renderAvatar('A');
+  renderAvatar('B');
+}
+
+function renderAvatar(p){
+  const el = document.getElementById('avatar'+p);
+  const textEl = document.getElementById('avatarText'+p);
+  if(!el || !textEl) return;
+  const url = state.avatars[p];
+  if(url){
+    textEl.style.display = 'none';
+    el.style.backgroundImage = `url(${url})`;
+    el.style.backgroundSize = 'cover';
+    el.style.backgroundPosition = 'center';
+  } else {
+    textEl.style.display = '';
+    el.style.backgroundImage = '';
+    el.style.backgroundSize = '';
+    el.style.backgroundPosition = '';
+  }
+}
+
+async function uploadAvatar(payer){
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'image/*';
+  input.onchange = async ()=>{
+    const file = input.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = async ()=>{
+      state.avatars[payer] = reader.result;
+      await saveConfig();
+      renderAvatar(payer);
+      toast('头像已更新');
+    };
+    reader.readAsDataURL(file);
+  };
+  input.click();
 }
 
 function selectPayer(p){
@@ -1164,6 +1215,8 @@ document.getElementById('calNext').onclick = ()=>{
 /* ===== 事件绑定 ===== */
 document.getElementById('payerBtnA').onclick = ()=>selectPayer('A');
 document.getElementById('payerBtnB').onclick = ()=>selectPayer('B');
+document.getElementById('avatarA').onclick = (ev)=>{ ev.stopPropagation(); uploadAvatar('A'); };
+document.getElementById('avatarB').onclick = (ev)=>{ ev.stopPropagation(); uploadAvatar('B'); };
 document.querySelectorAll('#panelLedger .currency-btn').forEach(b=>b.onclick = ()=>selectCurrency(b.dataset.curr));
 
 document.getElementById('catRow').onclick = ev=>{
@@ -1229,6 +1282,7 @@ document.getElementById('fileImport').onchange = async ev=>{
         try{
           for(const e of d.entries){ await API.addEntry(e); }
           if(d.names){ state.names=d.names; await saveConfig(); }
+          if(d.avatars){ state.avatars=d.avatars; await saveConfig(); }
           if(d.settled){ state.settled=d.settled; await saveConfig(); }
           if(d.customCats){ state.customCats=d.customCats; await saveConfig(); }
           state.entries = await API.getEntries(); renderLedgerAll(); toast('导入成功');
