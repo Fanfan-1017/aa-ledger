@@ -1014,8 +1014,8 @@ async function poll(){
       try{
         const c = JSON.parse(cfg.checkins);
         let normalized;
-        if(Array.isArray(c)) normalized = {A:[...c], B:[]};
-        else normalized = {A: c.A||[], B: c.B||[]};
+        if(Array.isArray(c)) normalized = {A:[...c], B:[], shared:[]};
+        else normalized = {A: c.A||[], B: c.B||[], shared: c.shared||[]};
         if(JSON.stringify(normalized)!==JSON.stringify(state.checkins)){ state.checkins=normalized; cfgChanged=true; }
       }catch(e){}
     }
@@ -1023,8 +1023,8 @@ async function poll(){
       try{
         const l = JSON.parse(cfg.checkinLogs);
         let normalized;
-        if(l && !l.A && !l.B) normalized = {A:{...l}, B:{}};
-        else normalized = {A: l.A||{}, B: l.B||{}};
+        if(l && !l.A && !l.B) normalized = {A:{...l}, B:{}, shared:{}};
+        else normalized = {A: l.A||{}, B: l.B||{}, shared: l.shared||{}};
         if(JSON.stringify(normalized)!==JSON.stringify(state.checkinLogs)){ state.checkinLogs=normalized; cfgChanged=true; }
       }catch(e){}
     }
